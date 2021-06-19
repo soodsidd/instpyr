@@ -1,5 +1,5 @@
-from MyDevices import switch
-from Interfaces.Arduino import  myarduino
+from src.InstPyr.MyDevices import switch
+from src.InstPyr.Interfaces.Arduino import  myarduino
 
 import time
 

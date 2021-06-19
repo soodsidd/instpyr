@@ -1,4 +1,4 @@
-from Interfaces.Common import interface,inf_enums
+from ..Interfaces.Common import interface,inf_enums
 class thermocouple():
     def __init__(self,interface:interface.interface,pins, type='k', units=inf_enums.TempUnits.CELSIUS):
         self.interface=interface

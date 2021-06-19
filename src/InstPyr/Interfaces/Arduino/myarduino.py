@@ -1,6 +1,6 @@
 import pyfirmata
-from Interfaces.Common.interface import interface
-from Interfaces.Common.inf_enums import *
+from ..Common.interface import interface
+from ..Common.inf_enums import *
 
 
 class myarduino(interface):

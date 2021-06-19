@@ -1,4 +1,4 @@
-from Interfaces.Common import interface
+from ..Interfaces.Common import interface
 
 
 class switch():

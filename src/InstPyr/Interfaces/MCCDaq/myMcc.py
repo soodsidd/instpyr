@@ -1,9 +1,9 @@
 from mcculw import ul
 from mcculw.device_info import DaqDeviceInfo
 from mcculw.enums import *
-from Interfaces.MCCDaq.console_examples_util import config_first_detected_device
-from Interfaces.Common.interface import interface
-from Interfaces.Common.inf_enums import *
+from console_examples_util import config_first_detected_device
+from ..Common.interface import interface
+from ..Common.inf_enums import *
 
 
 class myMcc(interface):
