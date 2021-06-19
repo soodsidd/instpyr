@@ -1,6 +1,6 @@
 
-from Common.interface import interface
-from Common.inf_enums import *
+from .Common.interface import interface
+from .Common.inf_enums import *
 import numpy as np
 
 class simulator(interface):
