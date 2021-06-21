@@ -9,7 +9,7 @@ class interface():
         """pass pins that have corresponding modes"""
         return self.not_implemented()
 
-    def write_digital(self, pin, state, voltage):
+    def write_digital(self, pin, state):
         return self.not_implemented()
 
     def read_digital(self, pin):
@@ -18,7 +18,7 @@ class interface():
     def read_analog(self, pin):
         return self.not_implemented()
 
-    def write_analog(self, pin, pwmvalue):
+    def write_analog(self, pin, pwmvalue=0,current=0,voltage=0,mode=0):
         return self.not_implemented()
 
     def configThermocouple(self,channel,type):
@@ -30,4 +30,17 @@ class interface():
     def not_implemented(self):
         print('not implemented')
         return None
+
+    def setDigitalVoltage(self, voltage, channel=0,currentlim=0):
+        return self.not_implemented()
+
+    def setDigitalCurrent(self,current,channel=0,voltagelim=0):
+        return self.not_implemented()
+
+    def setVoltageLim(self,voltagelim,channel=0):
+        return self.not_implemented()
+
+    def setCurrentLim(self,currentlim,channel=0):
+        return self.not_implemented()
+
 
