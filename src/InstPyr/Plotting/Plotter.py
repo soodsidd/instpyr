@@ -156,7 +156,8 @@ class MyPlotter:
                     self.oneaxis=True
         else:
             raise Exception('bad data')
-
+    def hide(self,key):
+        pass
     def clear(self):
         for key in list(self.pltdata.keys()):
             self.pltdata[key].xdata=[]
