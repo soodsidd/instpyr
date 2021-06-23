@@ -156,8 +156,14 @@ class MyPlotter:
                     self.oneaxis=True
         else:
             raise Exception('bad data')
-    def hide(self,key):
-        pass
+    def hide(self,linename):
+        if linename in list(self.pltdata.keys()):
+            self.pltdata[linename].visible=False
+
+    def show(self,linename):
+        if linename in list(self.pltdata.keys()):
+            self.pltdata[linename].visible=True
+
     def clear(self):
         for key in list(self.pltdata.keys()):
             self.pltdata[key].xdata=[]
@@ -208,6 +214,7 @@ class _plotdata:
         self.name=name
         self.plotlen=len(self.xdata)
         self._plot_ref=None
+        self.visible=True
 
     def update(self,xdata,ydata):
         self.xdata.append(xdata)
@@ -219,8 +226,12 @@ class _plotdata:
         else:
             lowind=0
             highind=self.plotlen-1
-        self._plot_ref.set_data(self.xdata[lowind:highind],self.ydata[lowind:highind])
-        self._plot_ref.set_label(self.name+':'+str(ydata))
+        if self.visible:
+            self._plot_ref.set_data(self.xdata[lowind:highind],self.ydata[lowind:highind])
+            self._plot_ref.set_label(self.name+':'+str(ydata))
+        else:
+            self._plot_ref.set_data(None,None)
+            self._plot_ref.set_label('_nolegend_')
 
 
 class _PlotTester(QMainWindow):
@@ -253,8 +264,10 @@ class _PlotTester(QMainWindow):
         d1=105.23-np.random.randint(5)
         d2=80.12-np.random.randint(5)
         self.myplot.updatedata([datetime.now(),d1,d2])
+        self.myplot.hide('Temperature_lid')
         if d1>105:
             self.myplot.annotate('Hi')
+            self.myplot.show('Temperature_lid')
 
         # self.myplot.legend=False
         # self.myplot.autoscale=True
