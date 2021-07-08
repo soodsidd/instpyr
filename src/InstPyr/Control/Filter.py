@@ -8,12 +8,19 @@ class MyFilter:
     def lowpass(cls,data,cutoff, sampling):
         # if self.lowpassfilt==None:
         # b, a = signal.butter(10,cutoff,fs=sampling)
+        b,a=signal.butter(10,cutoff,fs=sampling)
+        # print(data)
+        # print(b)
+        # print(a)
+        y=signal.filtfilt(b,a,data)
+        # print(y)
+        yout=y[len(y)-1]
         # # print(b)
         # newval=signal.filtfilt(b,a,data,padlen=0)
         # print(newval)
         # return newval[len(newval)-1]
         #TODO figure out how lowpass filtering works
-        return np.average(data)
+        return yout
 
     @classmethod
     def movingaverage(cls,data,pts=0):

@@ -6,8 +6,8 @@ class MySensor:
         self.callfunc=callfunc
         self.name=name
         self.buffer=collections.deque(maxlen=buffer)
-        # for i in range(buffer):
-        #     self.buffer.append(0)
+        for i in range(buffer):
+            self.buffer.append(0)
 
     def read(self):
         val=self.callfunc(self.sensor)
