@@ -2,8 +2,9 @@ import collections
 
 class watch:
     #use this class to define a 'watch' variable- that you will log and plot
-    def __init__(self, object, callfunc, name, buffer=10):
+    def __init__(self,name, variable=None,object=None, callfunc=None, buffer=10):
         self.object = object
+        self.variable=variable
         self.callfunc = callfunc
         self.name = name
         self.buffer = collections.deque(maxlen=buffer)

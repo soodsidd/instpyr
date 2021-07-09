@@ -43,4 +43,10 @@ class interface():
     def setCurrentLim(self,currentlim,channel=0):
         return self.not_implemented()
 
+    def disableoutputs(self):
+        return self.not_implemented()
+
+    def shutdown(self):
+        return self.not_implemented()
+
 

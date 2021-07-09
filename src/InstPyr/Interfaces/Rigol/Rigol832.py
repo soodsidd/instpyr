@@ -10,6 +10,7 @@ class Rigol832(interface):
     def __init__(self):
         super().__init__(self)
         self.analogmode='CV'
+        self.currentchannel=1
         try:
             self.rm=pyvisa.ResourceManager()
             self.instrument_list=self.rm.list_resources()
@@ -27,12 +28,16 @@ class Rigol832(interface):
 
         except VisaIOError:
             print('Instrument not found')
+        self.initializeIO()
 
 
 
     def initializeIO(self, din=[], dout=[], ain=[],
                      aout=[]):
-        pass
+        for i in range(3):
+            self.setOCP(i+1,False)
+            self.setOVP(i+1,False)
+            self.write_digital(i+1,0)
 
 
     def write_digital(self, channel, state):
@@ -51,13 +56,11 @@ class Rigol832(interface):
         if mode !='':
             self.analogmode=mode
         if self.analogmode=='CC':
-            self.SetCurrent(channel,current)
+            self.setCurrent(channel,current)
         elif self.analogmode=='CV':
-            self.SetVoltage(channel, voltage)
+            self.setVoltage(channel, voltage)
         if self.read_digital(channel)=='OFF':
             self.write_digital(channel,1)
-
-
 
 
 
@@ -82,19 +85,70 @@ class Rigol832(interface):
         command=':MEAS:POWE? CH%s'%(channel)
         return self.device.query(command)
 
-    def SetCurrent(self,channel,current):
-        command=':INST:NSEL %s'%(channel)
+    def setCurrent(self,channel,current):
+        # command=':INST:NSEL %s'%(channel)
+        command = ':APPL Ch%s,,%s' % (channel, current)
         self.device.write(command)
         time.sleep(_delay)
-        command=':CURR %s'%current
+        # command=':CURR %s'%current
+        # time.sleep(_delay)
+
+    def setVoltage(self,channel,voltage):
+        # command = ':INST:NSEL %s' % (channel)
+        # self.device.write(command)
+        command=':APPL Ch%s,%s'%(channel,voltage)
+        time.sleep(_delay)
+        # command = ':VOLT %s' % voltage
+        self.device.write(command)
         time.sleep(_delay)
 
-    def SetVoltage(self,channel,voltage):
-        command = ':INST:NSEL %s' % (channel)
+    def setCurrentLim(self,currentlim,channel=0):
+        if channel==0:
+            for i in range(3):
+                command=':OUTP:OCP:VAL CH%s,%s'%(i+1,currentlim)
+                time.sleep(_delay)
+                self.device.write(command)
+                self.setOCP(i+1,True)
+
+        else:
+            command=':OUTP:OCP:VAL CH%s,%s'%(channel,currentlim)
+            time.sleep(_delay)
+            self.device.write(command)
+            self.setOCP(channel,True)
+
+    def setOCP(self,channel,state):
+        st='ON' if state==True else 'OFF'
+        command = 'OUTP:OCP CH%s,%s' % (channel,st)
+        time.sleep(_delay)
         self.device.write(command)
+
+    def setOVP(self, channel, state):
+        st = 'ON' if state == True else 'OFF'
+        command = 'OUTP:OVP CH%s,%s' % (channel, st)
         time.sleep(_delay)
-        command = ':VOLT %s' % voltage
-        time.sleep(_delay)
+        self.device.write(command)
+
+    def setVoltageLim(self,voltagelim,channel=0):
+        if channel==0:
+            for i in range(3):
+                command=':OUTP:OVP:VAL CH%s,%s'%(i+1,voltagelim)
+                time.sleep(_delay)
+                self.device.write(command)
+                self.setOVP(i+1,True)
+        else:
+            command=':OUTP:OVP:VAL CH%s,%s'%(channel,voltagelim)
+            time.sleep(_delay)
+            self.device.write(command)
+            self.setOVP(channel,True)
+
+    def disableoutputs(self):
+        self.write_digital(1,0)
+        self.write_digital(2,0)
+        self.write_digital(3,0)
+
+    def shutdown(self):
+        self.disableoutputs()
+
 
 
 
