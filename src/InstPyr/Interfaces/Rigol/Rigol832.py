@@ -14,7 +14,7 @@ class Rigol832(interface):
         try:
             self.rm=pyvisa.ResourceManager()
             self.instrument_list=self.rm.list_resources()
-
+            print(self.instrument_list)
             self.address=[elem for elem in self.instrument_list if (elem.find('USB')!=-1) and elem.find('DP')!=-1]
             if self.address.__len__() == 0:
                 self.status = "Not Connected"
@@ -22,7 +22,7 @@ class Rigol832(interface):
             else:
                 self.address = self.address[0]
                 self.device = self.rm.open_resource(self.address)
-                # print("Connected to " + self.address)
+                print("Connected to " + self.address)
                 self.status = "Connected"
                 self.connected_with = 'USB'
 
