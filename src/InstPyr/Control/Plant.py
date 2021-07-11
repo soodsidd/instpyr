@@ -2,7 +2,7 @@ import control
 import numpy as np
 import matplotlib.pyplot as plt
 import collections
-import Noise
+
 
 class Plant:
     def __init__(self,tf_num, tf_den):
@@ -35,17 +35,18 @@ class Plant:
             self.xprev=np.squeeze(x_temp[:,-1])
             self.tprev=tin
 
-            return yout
         else:
-            return 0
+            yout=0
+        return yout
 
 if __name__=='__main__':
-    s=Plant([1,1],[1,0.1,2])
+    import Noise
+    s=Plant([1,1],[1,1.1,1.1,1])
     # s.stepResponse()
     nt=1000
     x=np.zeros(nt)
     x[int(0.1*nt):int(0.95*nt)]=1
-    t=np.linspace(1,100,nt)
+    t=np.linspace(1,500,nt)
     y=[]
     for i in range(len(x)):
         # print(i)
