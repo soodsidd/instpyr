@@ -58,12 +58,17 @@ class MainWindow(QMainWindow,mainpanel.Ui_MainWindow):
         self.sensors={}
         self.var_checkboxes=[]
         for t in thermconfig.keys():
-            self.sensors[t]=watch.watch(thermocouple(self.interface,thermconfig[t][0]),thermocouple.readTemperature,name=thermconfig[t][1],buffer=100)
+            self.sensors[t]=watch.watch(name=thermconfig[t][1],object=thermocouple(self.interface,thermconfig[t][0]),callfunc=thermocouple.readTemperature,buffer=100)
             # self.var_checkboxes+=[self.addCheckbox(thermconfig[t][1],t)]
-        self.sensors['Lowpass']=watch.watch(self.sensors['sktop'],lambda x: MyFilter.lowpass(list(x.buffer),0.25,10),
-                                                 'Low pass filter (C)')
+        self.sensors['Lowpass']=watch.watch(object=self.sensors['sktop'],callfunc=lambda x: MyFilter.lowpass(list(x.buffer),0.25,10),
+                                                 name='Low pass filter (C)')
 
         self.logger=None
+
+
+        #Variables
+        self.realTemp=0
+        self.sensors['realtemp']=watch.watch('Real Temperature',id(self.realTemp))
 
         #initialize sensor variables
         # self.sensornames=['Temperature_SkirtBottom (C)','Temperature_SkirtTop (C)','Temperature_Cuvette (C)']
@@ -107,8 +112,10 @@ class MainWindow(QMainWindow,mainpanel.Ui_MainWindow):
     def mainloop(self):
         # for t in self.thermocouples:
         #     t.readTemperature()
+        self.realTemp=(self.sensors['Cuv'].val+self.sensors['skbot'].val)/2
+        # print(id(self.realTemp))
 
-        data=[datetime.now()]+[x.read() for x in self.sensors.values()]
+        data=[datetime.now()]+[x.read() for x in self.sensors.values()]+[self.realTemp]
         # filtered=MyFilter.lowpass(list(self.sensors['sktop'].buffer),0.25,10)
         # data+=[filtered]
         self.dispQueue.put(data)
@@ -206,6 +213,10 @@ class MainWindow(QMainWindow,mainpanel.Ui_MainWindow):
                 #construct blank data:
                 self.eventQueue.put(self.annotatemsg.toPlainText())
             self.annotatemsg.setText('')
+
+        if name=='horZoom':
+            self.plot.buffer=int(10000*self.horZoom.value()/100)
+            print(self.plot.buffer)
 
         if name in self.var_checkboxes:
             exec("self.cname=self."+name)

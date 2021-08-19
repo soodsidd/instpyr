@@ -4,12 +4,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-motor=plant.Plant([1,1],[1,1.5,1])
+motor=plant.Plant([1,1],[1,2])
 nt=1000
 t=np.linspace(0,100,nt)
 
+# motor.impulseResponse()
 
-pid=PID.PID(7,10,0,0,10)
+# plt.close('all')
+
+pid=PID.PID(0.5,5,0,0,10)
 # pid=PID.PID(10,0,0,0,10)
 setpoint=1
 y=[]

@@ -11,12 +11,13 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from .CustomWidgets.mplwidget import MplWidget
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1230, 857)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../img/temperature.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("../../../../TemperatureLogger/img/temperature.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -201,16 +202,8 @@ class Ui_MainWindow(object):
         self.frame_3.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_3.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_3.setObjectName("frame_3")
-        self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.frame_3)
-        self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.plot = MplWidget(self.frame_3)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(39)
-        sizePolicy.setHeightForWidth(self.plot.sizePolicy().hasHeightForWidth())
-        self.plot.setSizePolicy(sizePolicy)
-        self.plot.setObjectName("plot")
-        self.verticalLayout_6.addWidget(self.plot)
+        self.horizontalLayout_4 = QtWidgets.QHBoxLayout(self.frame_3)
+        self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         self.statusbar_2 = QtWidgets.QLabel(self.frame_3)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
@@ -222,7 +215,19 @@ class Ui_MainWindow(object):
         self.statusbar_2.setFont(font)
         self.statusbar_2.setText("")
         self.statusbar_2.setObjectName("statusbar_2")
-        self.verticalLayout_6.addWidget(self.statusbar_2)
+        self.horizontalLayout_4.addWidget(self.statusbar_2)
+        self.plot = MplWidget(self.frame_3)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(39)
+        sizePolicy.setHeightForWidth(self.plot.sizePolicy().hasHeightForWidth())
+        self.plot.setSizePolicy(sizePolicy)
+        self.plot.setObjectName("plot")
+        self.horizontalLayout_4.addWidget(self.plot)
+        self.horZoom = QtWidgets.QSlider(self.frame_3)
+        self.horZoom.setOrientation(QtCore.Qt.Vertical)
+        self.horZoom.setObjectName("horZoom")
+        self.horizontalLayout_4.addWidget(self.horZoom)
         self.horizontalLayout.addWidget(self.frame_3)
         self.frame_4 = QtWidgets.QFrame(self.centralwidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
@@ -262,6 +267,8 @@ class Ui_MainWindow(object):
         self.logenable.stateChanged['int'].connect(MainWindow.eventHandler)
         self.clear.clicked.connect(MainWindow.eventHandler)
         self.annotate.clicked.connect(MainWindow.eventHandler)
+        self.horZoom.valueChanged['int'].connect(MainWindow.eventHandler)
+        self.horZoom.sliderMoved['int'].connect(MainWindow.eventHandler)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -284,7 +291,6 @@ class Ui_MainWindow(object):
         self.annotate.setText(_translate("MainWindow", "Annotate!"))
         self.groupBox.setTitle(_translate("MainWindow", "Variables"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
-
 
 
 if __name__ == "__main__":

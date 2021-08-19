@@ -14,7 +14,6 @@ class MplCanvas(Canvas):
     def __init__(self):
         self.fig = Figure()
         self.ax = self.fig.add_subplot(111)
-        self.ax.margins(x=0)
         self.ax.minorticks_on()
         self.ax.grid(b=True, which='major', color='silver', linestyle='-')
         self.ax.grid(b=True, which='minor', color='gainsboro', linestyle='--')
