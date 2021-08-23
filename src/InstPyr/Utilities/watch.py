@@ -3,9 +3,9 @@ import _ctypes
 
 class watch:
     #use this class to define a 'watch' variable- that you will log and plot
-    def __init__(self,name, variableId=None,object=None, callfunc=None, buffer=10):
+    def __init__(self,name, variableName=None,object=None, callfunc=None, buffer=10):
         self.object = object
-        self.variableID=variableId
+        self.variableName=variableName
         self.callfunc = callfunc
         self.name = name
 
@@ -24,8 +24,8 @@ class watch:
 
 
     def read(self):
-        if self.variableID is not None:
-            val=_ctypes.PyObj_FromPtr(self.variableID)[0]
+        if self.variableName is not None:
+            val=self.callfunc(self.variableName)
         else:
             val = self.callfunc(self.object)
         self.buffer.append(val)

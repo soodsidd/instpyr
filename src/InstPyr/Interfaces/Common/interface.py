@@ -24,7 +24,7 @@ class interface():
     def configThermocouple(self,channel,type):
         return self.not_implemented()
 
-    def readTemperature(self,channel,units):
+    def readTemperature(self,channel,units=None):
         return self.not_implemented()
 
     def not_implemented(self):

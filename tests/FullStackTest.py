@@ -22,7 +22,8 @@ from src.InstPyr.MyDevices.thermocouple import thermocouple
 from src.InstPyr.Plotting import Plotter
 from src.InstPyr.Logging import Logger
 from src.InstPyr.Utilities import watch
-
+from src.InstPyr.MyDevices.Lakeshore_probe import Lakeshore218_probe
+from varname import nameof
 
 class Worker(QRunnable):
     def __init__(self, fn, *args, **kwargs):
@@ -57,21 +58,26 @@ class MainWindow(QMainWindow,mainpanel.Ui_MainWindow):
                      'Cuv': [4, 'Temperature_Cuvette(C)']}
         self.sensors={}
         self.var_checkboxes=[]
+
+        #variables
+        self.realTemp = 0
+        self.logger = None
+        self.buffersize = self.Buffersize.value()
+        self.samplingrate = 100  # int(1000/self.Sampling.value())
+        self.logfilename = ''
+        self.logEnable = False
+
+
+        #sensor
         for t in thermconfig.keys():
             self.sensors[t]=watch.watch(name=thermconfig[t][1],object=thermocouple(self.interface,thermconfig[t][0]),callfunc=thermocouple.readTemperature,buffer=100)
             # self.var_checkboxes+=[self.addCheckbox(thermconfig[t][1],t)]
         self.sensors['Lowpass']=watch.watch(object=self.sensors['sktop'],callfunc=lambda x: MyFilter.lowpass(list(x.buffer),0.25,10),
                                                  name='Low pass filter (C)')
+        self.sensors['realtemp'] = watch.watch('Real Temperature', nameof(self.realTemp), callfunc=self.variableProbe)
 
-        self.logger=None
+        self.sensors['Lakeshoretemp']=watch.watch('Lakeshore temp',object=Lakeshore218_probe(self.interface,1),callfunc=Lakeshore218_probe.readTemperature)
 
-
-        #Variables
-        self.realTemp=0
-        self.sensors['realtemp']=watch.watch('Real Temperature',id(self.realTemp))
-
-        #initialize sensor variables
-        # self.sensornames=['Temperature_SkirtBottom (C)','Temperature_SkirtTop (C)','Temperature_Cuvette (C)']
 
 
         #setup widgets
@@ -83,11 +89,7 @@ class MainWindow(QMainWindow,mainpanel.Ui_MainWindow):
             self.var_checkboxes+=[self.addCheckbox(self.sensors[key].name,key)]
         self.statusmsg.connect(self.eventHandler)
 
-        #shared variables
-        self.buffersize=self.Buffersize.value()
-        self.samplingrate=100#int(1000/self.Sampling.value())
-        self.logfilename=''
-        self.logEnable=False
+
 
         #setup threads
         self.threadpool=QThreadPool()
@@ -110,20 +112,13 @@ class MainWindow(QMainWindow,mainpanel.Ui_MainWindow):
         self.dispQueue.join()
 
     def mainloop(self):
-        # for t in self.thermocouples:
-        #     t.readTemperature()
+
         self.realTemp=(self.sensors['Cuv'].val+self.sensors['skbot'].val)/2
-        # print(id(self.realTemp))
 
         data=[datetime.now()]+[x.read() for x in self.sensors.values()]+[self.realTemp]
-        # filtered=MyFilter.lowpass(list(self.sensors['sktop'].buffer),0.25,10)
-        # data+=[filtered]
+
         self.dispQueue.put(data)
         if self.logEnable:
-
-        #     self.logQueue.put(data)
-        #
-        # #     #poll event queue
             try:
                 event=self.eventQueue.get(timeout=0.1)
                 self.logQueue.put(data+[event])
@@ -249,7 +244,8 @@ class MainWindow(QMainWindow,mainpanel.Ui_MainWindow):
         return varname
 
 
-
+    def variableProbe(self,name):
+        return eval('self.'+name)
 
 
 

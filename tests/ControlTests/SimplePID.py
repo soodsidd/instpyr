@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-motor=plant.Plant([1,1],[1,2])
+motor=plant.Plant([1,1],[1,2,1])
 nt=1000
 t=np.linspace(0,100,nt)
 
