@@ -41,7 +41,7 @@ class Plant:
 
 if __name__=='__main__':
     import Noise
-    s=Plant([1,1],[1,1.1,1.1,1])
+    s=Plant([1],[1,0.5,1])
     # s.stepResponse()
     nt=1000
     x=np.zeros(nt)
@@ -51,7 +51,7 @@ if __name__=='__main__':
     for i in range(len(x)):
         # print(i)
         out=s.realTime(x[i],t[i])
-        out+=next(Noise.Noise.generate(0.1))
+        # out+=next(Noise.Noise.generate(0.1))
         y.append(out)
 
     plt.plot(t,y)

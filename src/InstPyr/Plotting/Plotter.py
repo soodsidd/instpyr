@@ -228,7 +228,7 @@ class _plotdata:
             highind=self.plotlen-1
         if self.visible:
             self._plot_ref.set_data(self.xdata[lowind:highind],self.ydata[lowind:highind])
-            self._plot_ref.set_label(self.name+':'+str(ydata))
+            self._plot_ref.set_label(self.name+':'+f"{ydata:.2f}")
         else:
             self._plot_ref.set_data(None,None)
             self._plot_ref.set_label('_nolegend_')
