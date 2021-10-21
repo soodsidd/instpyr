@@ -75,12 +75,12 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.I=0
 
         #sensors
-        self.sensors['motoroutput']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
+        self.sensors['motoroutput_k']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
         # self.sensors['controlsignal']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
         # self.sensors['setpoint']=watch.watch('Setpoint',nameof(self.setpoint),callfunc=self.variableProbe)
-        self.sensors['error']=watch.watch('Error signal',nameof(self.error),callfunc=self.variableProbe)
-        self.sensors['P']=watch.watch('P contribution',nameof(self.P),callfunc=self.variableProbe)
-        self.sensors['I']=watch.watch('I contribution',nameof(self.I),callfunc=self.variableProbe)
+        self.sensors['error_k']=watch.watch('Error signal',nameof(self.error),callfunc=self.variableProbe)
+        self.sensors['P_k']=watch.watch('P contribution',nameof(self.P),callfunc=self.variableProbe)
+        self.sensors['I_k']=watch.watch('I contribution',nameof(self.I),callfunc=self.variableProbe)
 
         # self.sensors['controlsignal']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
 
