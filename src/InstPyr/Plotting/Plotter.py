@@ -9,7 +9,7 @@ import numpy as np
 import numpy as np
 
 class MyPlotter:
-    def __init__(self, PlotWidget, buffersize=100, initdata=None, oneaxis=False):
+    def __init__(self, PlotWidget, buffersize=100, initdata=None, oneaxis=False, datetimeaxis=True):
         # setup the plot here- empty data
         #initdata must be a dictionary
         #initialize plotdata objects
@@ -23,6 +23,7 @@ class MyPlotter:
         self.legend = True
         self.autoscale=True
         self.ylims=[0,0]
+        self.datetimeaxis=datetimeaxis
 
         #connect plotwidget autoscale to autoscale flag:
         self.plotwidget.auto_scale.connect(self._toolbaractive)
@@ -52,7 +53,10 @@ class MyPlotter:
         for pltdta in self.pltdata.values():
             lines+=1
             if not lines>=2:
-                plot_refs = self.plotwidget.canvas.ax.plot_date(pltdta.xdata, pltdta.ydata, label=pltdta.name,fmt='-b')
+                if self.datetimeaxis:
+                    plot_refs = self.plotwidget.canvas.ax.plot_date(pltdta.xdata, pltdta.ydata, label=pltdta.name,fmt='-b')
+                else:
+                    plot_refs=self.plotwidget.canvas.ax.plot(pltdta.xdata,pltdta.ydata,label=pltdta.name)
                 pltdta._plot_ref = plot_refs[0]
                 if not oneaxis:
                     #if oneaxis is true, then have a legend
@@ -62,13 +66,19 @@ class MyPlotter:
                     self.plotwidget.canvas.ax.yaxis.label.set_color('blue')
                     self.plotwidget.canvas.ax.tick_params(axis='y', colors='blue')
             elif oneaxis:
-                plot_refs = self.plotwidget.canvas.ax.plot_date(pltdta.xdata, pltdta.ydata, label=pltdta.name, fmt='-')
+                if self.datetimeaxis:
+                    plot_refs = self.plotwidget.canvas.ax.plot_date(pltdta.xdata, pltdta.ydata, label=pltdta.name, fmt='-')
+                else:
+                    plot_refs=self.plotwidget.canvas.ax.plot(pltdta.xdata,pltdta.ydata,label=pltdta.name)
                 self.legend=True
                 pltdta._plot_ref = plot_refs[0]
 
             else:
                 self.ax2=self.plotwidget.canvas.ax.twinx()
-                plot_refs=self.ax2.plot_date(pltdta.xdata,pltdta.ydata,label=pltdta.name,fmt='-r')
+                if self.datetimeaxis:
+                    plot_refs=self.ax2.plot_date(pltdta.xdata,pltdta.ydata,label=pltdta.name,fmt='-r')
+                else:
+                    plot_refs=self.ax2.plot(pltdta.xdata,pltdta.ydata,label=pltdta.name)
                 self.ax2.set_ylabel(pltdta.name)
                 self.ax2.yaxis.label.set_color('red')
                 self.ax2.tick_params(axis='y', colors='red')
@@ -117,10 +127,18 @@ class MyPlotter:
     def addLine(self,linename,data=None, linefmt=None):
         #TODO have ability to add a new line such that it is on the twin axis
         if linefmt==None:
-            plot_refs = self.plotwidget.canvas.ax.plot_date([], [], label=linename,
+            if self.datetimeaxis:
+                plot_refs = self.plotwidget.canvas.ax.plot_date([], [], label=linename,
                                                         fmt='-',drawstyle='default')
+            else:
+                plot_refs=self.plotwidget.canvas.ax.plot([],[],label=linename,
+                                                         fmt='-',drawstyle='default')
         else:
-            plot_refs = self.plotwidget.canvas.ax.plot_date([], [], label=linename,
+            if self.datetimeaxis:
+                plot_refs = self.plotwidget.canvas.ax.plot_date([], [], label=linename,
+                                                            fmt=linefmt,drawstyle='default')
+            else:
+                plot_refs = self.plotwidget.canvas.ax.plot([], [], label=linename,
                                                             fmt=linefmt,drawstyle='default')
         self.legend = True
         self.pltdata[linename] = _plotdata([], [], linename,self.buffer)
@@ -147,8 +165,12 @@ class MyPlotter:
                     self.pltdata[key].update(data[key][0],data[key][1])
                 else:
                     #create a line for the new axis
-                    plot_refs = self.plotwidget.canvas.ax.plot_date([], [], label=key,
+                    if self.datetimeaxis:
+                        plot_refs = self.plotwidget.canvas.ax.plot_date([], [], label=key,
                                                                     fmt='-',drawstyle='default')
+                    else:
+                        plot_refs = self.plotwidget.canvas.ax.plot([], [], label=key,
+                                                                        fmt='-', drawstyle='default')
                     self.legend = True
                     self.pltdata[key]=_plotdata([],[],key,self.buffer)
                     self.pltdata[key]._plot_ref= plot_refs[0]
@@ -243,7 +265,7 @@ class _PlotTester(QMainWindow):
         #                                        'Temperature_skirt':[],
         #                                        'Temperature_lid':[]}, oneaxis=True)
         self.myplot=MyPlotter(self.w,initdata={'Temperature_innercore':[],
-                                               'Temperature_lid':[]}, buffersize=100000, oneaxis=True)
+                                               'Temperature_lid':[]}, buffersize=100000, oneaxis=True,datetimeaxis=False)
         # self.myplot.removeLine('Temperature_skirt')
         # self.myplot.addLine('Temperature_Ambient')
         # self.myplot2=MyPlotter(self.w,100)

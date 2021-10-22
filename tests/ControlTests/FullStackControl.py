@@ -18,8 +18,7 @@ import time
 import src.InstPyr.Interfaces.simulator as simulator
 # from src.InstPyr.Control.Sensor import MySensor
 from src.InstPyr.Control.Filter import MyFilter
-from src.InstPyr.Control import PID
-from src.InstPyr.Control import Plant
+from src.InstPyr.Control import PID,Plant,Waveform
 from src.InstPyr.MyDevices.thermocouple import thermocouple
 from src.InstPyr.Plotting import Plotter
 from src.InstPyr.Logging import Logger
@@ -48,11 +47,12 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #setup interface and devices
         # self.interface=myMcc.myMcc()
-        self.motor=Plant.Plant([1],[1,0.01])
+        self.motor=Plant.Plant([1],[1,3,2])
         self.interface=simulator.simulator()
+
         #create a simulated system based on a transfer function
 
-        self.pidcontroller=PID.PID(0.1,0.01,0,-10,10)
+        self.pidcontroller=PID.PID(10,1,4,-10,10)
 
 
         self.sensors={}
@@ -61,7 +61,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         #variables
         self.logger = None
         self.buffersize = self.Buffersize.value()
-        self.samplingrate = 200  # int(1000/self.Sampling.value())
+        self.samplingrate = 100  # int(1000/self.Sampling.value())
         self.logfilename = ''
         self.logEnable = False
 
@@ -73,6 +73,9 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.controlsignal=0
         self.P=0
         self.I=0
+        self.squarewave=Waveform.square(self.samplingrate/1000,30,5,-5)
+        self.osc_setpoint=False
+
 
         #sensors
         self.sensors['motoroutput_k']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
@@ -86,7 +89,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
 
         #setup widgets
-        self.plot=Plotter.MyPlotter(self.plot, initdata={self.sensors[x].name:[] for x in self.sensors.keys()},buffersize=1000,oneaxis=True)
+        self.plot=Plotter.MyPlotter(self.plot, initdata={self.sensors[x].name:[] for x in self.sensors.keys()},buffersize=1000,oneaxis=True,datetimeaxis=False)
         # self.plot.addLine('MovingAvgFilter')
 
 
@@ -119,16 +122,15 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
     def mainloop(self):
         self.currentTime+=self.samplingrate/1000
         self.motoroutput=self.motor.realTime(self.controlsignal,self.currentTime)
+        if self.osc_setpoint:
+            self.setpoint=self.squarewave.nextval()
         self.error=self.setpoint-self.motoroutput
-        print(self.error)
-        print(self.currentTime)
         self.controlsignal=self.pidcontroller.apply(self.error,self.currentTime)
-        print(self.controlsignal)
         self.P=self.pidcontroller.P
         self.I=self.pidcontroller.I
 
 
-        data=[datetime.now()]+[x.read() for x in self.sensors.values()]
+        data=[self.currentTime]+[x.read() for x in self.sensors.values()]#[datetime.now()]
         self.dispQueue.put(data)
         if self.logEnable:
             try:
@@ -237,6 +239,19 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         if name=='Td':
             self.pidcontroller.Kd=self.Kp.value()*self.Td.value()
+
+
+        if name=='squaregen':
+            if self.squaregen.isChecked():
+                self.squarewave=Waveform.square(self.samplingrate/1000,self.squareperiod.value(),
+                                                self.squareamp.value(),
+                                                -self.squareamp.value())
+                self.squaregen.setText('Stop')
+                self.osc_setpoint=True
+            else:
+                self.squaregen.setText('Generate')
+                self.osc_setpoint=False
+
 
 
         if name in self.var_checkboxes:

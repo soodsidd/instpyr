@@ -232,6 +232,80 @@
             </item>
            </layout>
           </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="title">
+             <string>Setpoint Wave</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLabel" name="label_10">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Period</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="squareperiod">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <item>
+                <widget class="QLabel" name="label_11">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Amplitude</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="squareamp">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QPushButton" name="squaregen">
+               <property name="text">
+                <string>Generate</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -331,7 +405,7 @@
                  <double>0.100000000000000</double>
                 </property>
                 <property name="value">
-                 <double>1.000000000000000</double>
+                 <double>10.000000000000000</double>
                 </property>
                </widget>
               </item>
@@ -389,6 +463,12 @@
             </item>
             <item>
              <widget class="QTextEdit" name="filename">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>1000</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <pointsize>8</pointsize>
@@ -437,61 +517,6 @@ p, li { white-space: pre-wrap; }
              </widget>
             </item>
            </layout>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="Annotate">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>1</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>14</pointsize>
-          </font>
-         </property>
-         <property name="title">
-          <string>Annotate</string>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <widget class="QLabel" name="label_6">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-             </font>
-            </property>
-            <property name="text">
-             <string>Msg</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTextEdit" name="annotatemsg">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-             </font>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="annotate">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Annotate!</string>
-            </property>
-           </widget>
           </item>
          </layout>
         </widget>
@@ -649,7 +674,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>149</x>
-     <y>214</y>
+     <y>313</y>
     </hint>
     <hint type="destinationlabel">
      <x>230</x>
@@ -665,7 +690,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>149</x>
-     <y>239</y>
+     <y>338</y>
     </hint>
     <hint type="destinationlabel">
      <x>232</x>
@@ -681,7 +706,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>150</x>
-     <y>382</y>
+     <y>481</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
@@ -696,28 +721,12 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>148</x>
-     <y>262</y>
+     <x>151</x>
+     <y>361</y>
     </hint>
     <hint type="destinationlabel">
      <x>156</x>
      <y>39</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>annotate</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>eventHandler()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>151</x>
-     <y>507</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>219</x>
-     <y>447</y>
     </hint>
    </hints>
   </connection>
@@ -814,6 +823,54 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>487</x>
      <y>31</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>squareperiod</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>126</x>
+     <y>192</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>168</x>
+     <y>165</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>squareamp</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>113</x>
+     <y>218</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>169</x>
+     <y>206</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>squaregen</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>242</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>168</x>
+     <y>247</y>
     </hint>
    </hints>
   </connection>
