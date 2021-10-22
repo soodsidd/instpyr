@@ -47,12 +47,12 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #setup interface and devices
         # self.interface=myMcc.myMcc()
-        self.motor=Plant.Plant([1],[1,3,2])
+        self.motor=Plant.Plant([1],[1,100])
         self.interface=simulator.simulator()
 
         #create a simulated system based on a transfer function
 
-        self.pidcontroller=PID.PID(10,1,4,-10,10)
+        self.pidcontroller=PID.PID(0,0,0) #unbounded PID
 
 
         self.sensors={}
@@ -79,8 +79,8 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #sensors
         self.sensors['motoroutput_k']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
-        # self.sensors['controlsignal']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
-        # self.sensors['setpoint']=watch.watch('Setpoint',nameof(self.setpoint),callfunc=self.variableProbe)
+        self.sensors['controlsignal_k']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
+        self.sensors['setpoint_k']=watch.watch('Setpoint',nameof(self.setpoint),callfunc=self.variableProbe)
         self.sensors['error_k']=watch.watch('Error signal',nameof(self.error),callfunc=self.variableProbe)
         self.sensors['P_k']=watch.watch('P contribution',nameof(self.P),callfunc=self.variableProbe)
         self.sensors['I_k']=watch.watch('I contribution',nameof(self.I),callfunc=self.variableProbe)

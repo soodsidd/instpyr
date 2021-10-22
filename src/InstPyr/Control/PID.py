@@ -1,7 +1,7 @@
 import numpy as np
 
 class PID:
-    def __init__(self,Kp,Ki,Kd,out_min,out_max):
+    def __init__(self,Kp,Ki,Kd,out_min=-999999,out_max=999999):
         self.Kp=Kp
         self.Ki=Ki
         self.Kd=Kd
