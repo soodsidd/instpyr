@@ -154,11 +154,22 @@ class MyPlotter:
         start=0
         if isinstance(data, list):
             #data here is going to be 'timestamp' followed by data
-            for key in self.pltdata.keys():
-                self.pltdata[key].update(data[0],data[start+1])
-                start+=1
-            # self.pltdata[firstkey].update(data[0],data[1])
+            if any(isinstance(el, list) for el in data) or any(isinstance(el, np.ndarray) for el in data):
+                if len(data[0]) is not len(data[1]):
+                    print('Bad data')
+                else:
+                    for i in range(len(data[0])):
+                        start=0
+                        for key in self.pltdata.keys():
+                            self.pltdata[key].update(data[0][i],data[start+1][i])
+                            start+=1
+            else:
+                for key in self.pltdata.keys():
+                    self.pltdata[key].update(data[0],data[start+1])
+                    start+=1
+                # self.pltdata[firstkey].update(data[0],data[1])
         elif isinstance(data,dict):
+            #TODO add ability to accept dictionary of complete datasets
             #this dictionary could have 1 or 2 data objects
             for key in list(data.keys()):
                 if key in list(self.pltdata.keys()):

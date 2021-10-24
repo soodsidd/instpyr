@@ -10,18 +10,13 @@ from src.InstPyr.Plotting import Plotter
 from gekko import GEKKO
 import numpy as np
 
+OVERSHOOT_WEIGHT=0
+
 class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
     def __init__(self):
         super(self.__class__,self).__init__()
         self.setupUi(self)
 
-        self.m=GEKKO()
-        self.tf=self.simDuration.value()
-        self.steps=self.timeSteps.value()
-        self.m.time=np.linspace(0,self.tf,self.steps)
-        self.step=np.zeros(self.steps)
-        self.step[0:10]=0
-        self.step[11:]=self.stepAmp.value()
 
         self.TF_num=[]
         self.TF_den=[]
@@ -43,8 +38,14 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
 
 
         #setup widgets
-        self.mainplot=Plotter.MyPlotter(self.Plot1, initdata={},buffersize=1000,oneaxis=True,datetimeaxis=False)
-        # self.plot.addLine('MovingAvgFilter')
+        self.mainplot=Plotter.MyPlotter(self.Plot1, initdata={'Setpoint':[],
+                                                              'Process Variable':[]},buffersize=1000,oneaxis=True,datetimeaxis=False)
+
+        self.controllerplot = Plotter.MyPlotter(self.Plot2, initdata={'ControlSignal': []}, buffersize=1000, oneaxis=True,
+                                          datetimeaxis=False)
+
+        # self.mainplot.updatedata([self.m.time,self.step])
+        # self.mainplot.redraw()
 
     def eventHandler(self,*args):
         name=self.sender().objectName()
@@ -53,7 +54,7 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
         if name=='Autotune':
             self.parseTF()
             self.parsePID()
-            self.Autotune()
+            self.autotune()
 
         if name=='Simulate':
             pass
@@ -84,6 +85,16 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
 
     def autotune(self):
         # PID controller model
+        # reinitialize gekko
+
+        self.m=GEKKO()
+        self.tf=self.simDuration.value()
+        self.steps=self.timeSteps.value()
+        self.m.time=np.linspace(0,self.tf,self.steps)
+        self.step=np.zeros(self.steps)
+        self.step[0:10]=0
+        self.step[11:]=self.stepAmp.value()
+
         self.Kc = self.m.FV(value=self.Kcini, lb=self.KcLb, ub=self.KcUb)
         self.Kc.STATUS = 1
 
@@ -104,21 +115,42 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
         self.m.Equation(self.Intgl.dt() == self.err)
         self.m.Equation(self.OP == self.OP_0 + self.Kc * self.err + (self.Kc / self.Ti) * self.Intgl
                         - self.Kc * self.Td * self.PV.dt())
-        self.m.Obj(self.err ** 2)
+        self.m.Obj(self.err ** 2-self.doubleSpinBox.value()*self.err)
+        #TODO make UI control for overshoot weight
 
         # Process model
+
+        if len(self.TF_den)<3:
+            if len(self.TF_num)>=3:
+                print('Bad TF')
+            else:
+                self.m.Equation(self.TF_den[0]*self.PV.dt()+self.TF_den[1]
+                                ==self.TF_num[0]*self.OP.dt()+self.TF_num[1]*self.OP)
+
+
+
         # Kp = 1
         # tauP = 1
         # x = m.Var(value=0)
         # m.Equation(tauP * x.dt() + 0.25 * x == OP)
         # m.Equation(tauP * PV.dt() + 4 * PV == Kp * x)
         #
-        # # m.options.IMODE=4
-        # m.options.IMODE = 6
-        # m.solve()
-        # print('Kc: ' + str(Kc.value[0]))
-        print('TauI: ' + str(self.Ti.value[0]))
-        print('TauD: ' + str(self.Td.value[0]))
+        # self.m.options.IMODE=4
+        self.m.options.IMODE = 6
+        self.m.solve()
+        print('Kc: ' + str(self.Kc.value[0]))
+        print('Ti: ' + str(self.Ti.value[0]))
+        print('Td: ' + str(self.Td.value[0]))
+        self.Kc_ini.setValue(self.Kc.value[0])
+        self.Ti_ini.setValue(self.Ti.value[0])
+        self.Td_ini.setValue(self.Td.value[0])
+        self.mainplot.clear()
+        self.controllerplot.clear()
+        self.mainplot.updatedata([self.m.time,self.step,self.PV.value])
+        self.controllerplot.updatedata([self.m.time,self.OP.value])
+        self.mainplot.redraw()
+        self.controllerplot.redraw()
+
 
 
 app=QApplication(sys.argv)

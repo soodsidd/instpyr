@@ -33,7 +33,7 @@ Intgl=m.Var(value=0)
 err=m.Intermediate(SP-PV)
 m.Equation(Intgl.dt()==err)
 m.Equation(OP==OP_0+Kc*err+(Kc/tauI)*Intgl-Kc*tauD*PV.dt())
-m.Obj(err**2)
+m.Obj(err**2-0.01*err)
 
 #Process model
 Kp=1
