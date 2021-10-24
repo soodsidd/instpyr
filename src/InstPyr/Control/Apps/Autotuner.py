@@ -8,6 +8,7 @@ from queue import Queue
 import time
 from src.InstPyr.Plotting import Plotter
 from gekko import GEKKO
+from scipy.signal import tf2ss
 import numpy as np
 
 OVERSHOOT_WEIGHT=0
@@ -64,11 +65,7 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
         self.TF_den= self.parseArray(self.Tfden.text())
 
     def parseArray(self,text):
-        out_text = text.split('[')[1].split(']')[0].split(',')
-        out=[]
-        for i in out_text:
-            out=out+[float(i)]
-        return out
+        return [float(x) for x in text.strip('][').split(',')]
 
     def parsePID(self):
         self.Kcini=self.Kc_ini.value()
@@ -83,17 +80,36 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
         self.outmin=self.out_min.value()
         self.outmax=self.out_max.value()
 
+    def varmultiply(self,mat,s):
+        #return a list of summed values
+        out=[]
+        col=mat.shape[0]
+        rows=mat.shape[1]
+
+        for i in range(rows):
+            rowsum=0
+            for j in range(col):
+                rowsum+=mat[i][j]*s[i]
+            out+=[rowsum]
+        return out
+
+
+
     def autotune(self):
         # PID controller model
         # reinitialize gekko
 
         self.m=GEKKO()
+
+
         self.tf=self.simDuration.value()
         self.steps=self.timeSteps.value()
         self.m.time=np.linspace(0,self.tf,self.steps)
         self.step=np.zeros(self.steps)
         self.step[0:10]=0
         self.step[11:]=self.stepAmp.value()
+
+
 
         self.Kc = self.m.FV(value=self.Kcini, lb=self.KcLb, ub=self.KcUb)
         self.Kc.STATUS = 1
@@ -119,23 +135,21 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
         #TODO make UI control for overshoot weight
 
         # Process model
+        #convert transfer function to statespace
+        A,B,C,D=tf2ss(self.TF_num,self.TF_den)
+        #Find order of equation
+        order=len(A)
+        x=self.m.Array(self.m.Var,(order))
+        #create state variables
+        eqn=np.dot(A,x)
+        eqn2=np.dot(C,x)
 
-        if len(self.TF_den)<3:
-            if len(self.TF_num)>=3:
-                print('Bad TF')
-            else:
-                self.m.Equation(self.TF_den[0]*self.PV.dt()+self.TF_den[1]
-                                ==self.TF_num[0]*self.OP.dt()+self.TF_num[1]*self.OP)
 
+        for i in range(order):
+            self.m.Equation(x[i].dt()==eqn[i]+B[i][0]*self.OP)
 
+        self.m.Equation(self.PV==eqn2[0]+D[0][0]*self.OP)
 
-        # Kp = 1
-        # tauP = 1
-        # x = m.Var(value=0)
-        # m.Equation(tauP * x.dt() + 0.25 * x == OP)
-        # m.Equation(tauP * PV.dt() + 4 * PV == Kp * x)
-        #
-        # self.m.options.IMODE=4
         self.m.options.IMODE = 6
         self.m.solve()
         print('Kc: ' + str(self.Kc.value[0]))
