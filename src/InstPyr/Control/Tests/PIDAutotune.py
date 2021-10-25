@@ -2,6 +2,10 @@ from gekko import GEKKO
 import numpy as np
 import matplotlib.pyplot as plt
 
+
+
+
+
 m=GEKKO()
 
 tf=80 #seconds
