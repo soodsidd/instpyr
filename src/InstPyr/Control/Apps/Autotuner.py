@@ -65,18 +65,17 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
                                           self.TdLb,self.TdUb,
                                           self.outmin,self.outmax,
                                           self.doubleSpinBox.value())
-
+                print('Kc: ' + str(pidv.Kc))
+                print('Ti: ' + str(pidv.Ti))
+                print('Td: ' + str(pidv.Td))
+                self.Kc_ini.setValue(pidv.Kc)
+                self.Ti_ini.setValue(pidv.Ti)
+                self.Td_ini.setValue(pidv.Td)
+                self.plotresponse(res.time, res.step, res.PV, res.OP)
             except Exception:
                 pidv=0
                 res=0
-            print('Kc: ' + str(pidv.Kc))
-            print('Ti: ' + str(pidv.Ti))
-            print('Td: ' + str(pidv.Td))
-            self.Kc_ini.setValue(pidv.Kc)
-            self.Ti_ini.setValue(pidv.Ti)
-            self.Td_ini.setValue(pidv.Td)
 
-            self.plotresponse(res.time,res.step,res.PV,res.OP)
             # self.autotune()
 
         if name=='Simulate':

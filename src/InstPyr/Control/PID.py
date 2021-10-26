@@ -60,10 +60,11 @@ class PID:
         self.SP = self.m.Param(value=self.step)
         self.Intgl = self.m.Var(value=0)
         self.err = self.m.Intermediate(self.SP - self.PV)
+        self.overshoot=self.m.if2(self.err,self.err,0)
         self.m.Equation(self.Intgl.dt() == self.err)
         self.m.Equation(self.OP == self.OP_0 + self.Kc * self.err + (self.Kc / self.Ti) * self.Intgl
                         - self.Kc * self.Td * self.PV.dt())
-        self.m.Obj(self.err ** 2 - overshootweight* self.err)
+        self.m.Obj(self.err ** 2 + overshootweight*self.overshoot)
         # TODO make UI control for overshoot weight
 
         # Process model
@@ -82,6 +83,8 @@ class PID:
         self.m.Equation(self.PV == eqn2[0] + D[0][0] * self.OP)
 
         self.m.options.IMODE = 6
+        self.m.options.MAX_ITER=1000
+        # self.m.options.OTOL=0.5
         PIDvals = collections.namedtuple('PIDvals', ['Kc', 'Ti', 'Td'])
         StepResponse=collections.namedtuple('StepResponse',['time','step','PV','OP'])
 
@@ -106,6 +109,6 @@ if __name__=="__main__":
 
     # for i in range(len(t)):
     #     next(pid.apply())
-    pid,res=PID.autotune([1],[1,100],30,100,1)
+    pid,res=PID.autotune([1],[1,10],30,100,1)
     print(pid)
     print(res)

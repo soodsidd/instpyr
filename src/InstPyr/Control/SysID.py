@@ -36,7 +36,7 @@ class TF_identificator:
         print(params_cov)
         return {'k': params[0], 'tau': params[1]}
 
-    def identify_second_order(self, t, u, orig_output, method='lm', p0=[1.0, 1.0, 0.1],lb=[0,0,1],ub=[10,10,1.001]):
+    def identify_second_order(self, t, u, orig_output, method='trf', p0=[1.0, 1.0, 0.1],lb=[0,0,0],ub=[10,10,1.001]):
         self.inputs = u
         params, params_cov = opt.curve_fit(self.second_order_mdl, t, orig_output, bounds=(lb,ub),
                                            method=method, maxfev=1000, p0=p0)

@@ -155,14 +155,20 @@ class MyPlotter:
         if isinstance(data, list):
             #data here is going to be 'timestamp' followed by data
             if any(isinstance(el, list) for el in data) or any(isinstance(el, np.ndarray) for el in data):
-                if len(data[0]) is not len(data[1]):
-                    print('Bad data')
-                else:
-                    for i in range(len(data[0])):
-                        start=0
-                        for key in self.pltdata.keys():
+                # if len(data[0]) is not len(data[1]):
+                #     print(len(data[0]))
+                #     print(len(data[1]))
+                #     print('Bad data')
+                # else:
+                for i in range(len(data[0])):
+                    start=0
+                    for key in self.pltdata.keys():
+                        try:
                             self.pltdata[key].update(data[0][i],data[start+1][i])
                             start+=1
+                        except Exception:
+                            print('no data here')
+                            break
             else:
                 for key in self.pltdata.keys():
                     self.pltdata[key].update(data[0],data[start+1])
