@@ -13,4 +13,4 @@ class switch():
 
     def setstate(self, state):
         self.state=state
-        self.interface.write_digital(self.pin,self.state, self.voltage)
+        self.interface.write_digital(self.pin,self.state)

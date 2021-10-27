@@ -1,7 +1,7 @@
 from mcculw import ul
 from mcculw.device_info import DaqDeviceInfo
 from mcculw.enums import *
-from console_examples_util import config_first_detected_device
+from .console_examples_util import config_first_detected_device
 from ..Common.interface import interface
 from ..Common.inf_enums import *
 
