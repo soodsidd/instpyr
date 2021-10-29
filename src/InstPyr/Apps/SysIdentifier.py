@@ -13,6 +13,7 @@ from scipy.signal import tf2ss
 import numpy as np
 import pandas as pd
 from ast import literal_eval
+import xlrd
 
 
 class MainWindow(QMainWindow,mainpanel_sysid.Ui_MainWindow):

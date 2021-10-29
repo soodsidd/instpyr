@@ -60,7 +60,7 @@ class PID:
         self.SP = self.m.Param(value=self.step)
         self.Intgl = self.m.Var(value=0)
         self.err = self.m.Intermediate(self.SP - self.PV)
-        self.overshoot=self.m.if2(self.err,self.err,0)
+        self.overshoot=self.m.if2(self.err,-self.err,0)
         self.m.Equation(self.Intgl.dt() == self.err)
         self.m.Equation(self.OP == self.OP_0 + self.Kc * self.err + (self.Kc / self.Ti) * self.Intgl
                         - self.Kc * self.Td * self.PV.dt())
