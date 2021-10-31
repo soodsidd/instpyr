@@ -203,10 +203,15 @@ class MyPlotter:
         if linename in list(self.pltdata.keys()):
             self.pltdata[linename].visible=True
 
-    def clear(self):
-        for key in list(self.pltdata.keys()):
-            self.pltdata[key].xdata=[]
-            self.pltdata[key].ydata=[]
+    def clear(self,key=None):
+        if key==None:
+            for key in list(self.pltdata.keys()):
+                self.pltdata[key].xdata=[]
+                self.pltdata[key].ydata=[]
+        else:
+            if key in list(self.pltdata.keys()):
+                self.pltdata[key].xdata = []
+                self.pltdata[key].ydata = []
 
     def redraw(self):
         # update plot here

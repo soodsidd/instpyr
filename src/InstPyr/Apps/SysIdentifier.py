@@ -7,7 +7,7 @@ from src.InstPyr.UI import mainpanel_sysid
 from queue import Queue
 import time
 from src.InstPyr.Plotting import Plotter
-from src.InstPyr.Control import SysID
+from src.InstPyr.Control import SysId
 from gekko import GEKKO
 from scipy.signal import tf2ss
 import numpy as np
@@ -29,7 +29,7 @@ class MainWindow(QMainWindow,mainpanel_sysid.Ui_MainWindow):
         self.model=[]
         self.modelselected=0
 
-        self.sysID=SysID.TF_identificator()
+        self.sysID=SysId.TF_identificator()
         self.showParameters(0)
 
 
@@ -38,7 +38,7 @@ class MainWindow(QMainWindow,mainpanel_sysid.Ui_MainWindow):
         #setup widgets
         self.mainplot=Plotter.MyPlotter(self.plot, initdata={'Input':[],
                                                               'Actual':[],
-                                                             'Model':[]},buffersize=1000,oneaxis=True,datetimeaxis=False)
+                                                             'Model':[]},buffersize=100000,oneaxis=True,datetimeaxis=False)
 
 
 
@@ -73,33 +73,38 @@ class MainWindow(QMainWindow,mainpanel_sysid.Ui_MainWindow):
             if self.modelselect.currentIndex()==0:
                 #first order model
                 self.showParameters(0)
-                params=self.sysID.identify_first_order(self.time, self.input,self.actual)
+                params=self.sysID.identify_first_order_gek(self.time, self.input,self.actual)
                 k=params['k']
                 tau=params['tau']
                 self.K_fo.setText(str(params['k']))
                 self.Tau.setText(str(params['tau']))
                 self.Tf_num.setText('['+str(k)+']')
                 self.Tf_den.setText('['+str(tau)+',1]')
-                simout=self.sysID.first_order_mdl(self.time,k,tau)
+                simout=params['sim']
+                res=params['res']
+                self.label_4.setText(str(res))
+                self.mainplot.clear('Model')
                 for i in range(len(simout)):
                     self.mainplot.updatedata({'Model':[self.time[i],simout[i]]})
                 self.mainplot.redraw()
             else:
                 self.showParameters(1)
-                initialguess=literal_eval(self.initialGuess.text())
-                lowerbound=literal_eval(self.lowerB.text())
-                upperbound=literal_eval(self.upperB.text())
-
-                params = self.sysID.identify_second_order(self.time, self.input, self.actual, p0=initialguess,lb=lowerbound,ub=upperbound)
+                params = self.sysID.identify_second_order_damped(self.time, self.input, self.actual, dynamicsratiomax=self.spinBox.value())
                 k = params['k']
-                wn = params['wn']
-                zeta=params['zeta']
-                self.K_fo_3.setText(str(params['k']))
-                self.K_fo_4.setText(str(params['wn']))
-                self.K_fo_2.setText(str(params['zeta']))
-                self.Tf_num.setText('[{:.2f}]'.format(k))
-                self.Tf_den.setText('[1,{:.2f},{:.2f}]'.format(2*wn*zeta,wn**2))
-                simout = self.sysID.second_order_mdl(self.time, k,wn,zeta)
+                T1 = params['T1']
+                T2=params['T2']
+                T3 = params['T3']
+                self.K_so.setText(str(k))
+                self.T1_so.setText(str(T1))
+                self.T2_so.setText(str(T2))
+                self.T3_so.setText(str(T3))
+
+                self.Tf_num.setText('[{:.1f},{:.1f}]'.format(k*T3,k))
+                self.Tf_den.setText('[{:.1f},{:.1f},1]'.format(T1*T2,(T1+T2)))
+                res=params['res']
+                simout = params['sim']
+                self.label_4.setText(str(res))
+                self.mainplot.clear('Model')
                 for i in range(len(simout)):
                     self.mainplot.updatedata({'Model': [self.time[i], simout[i]]})
                 self.mainplot.redraw()
@@ -108,9 +113,12 @@ class MainWindow(QMainWindow,mainpanel_sysid.Ui_MainWindow):
         if order==0:
             self.firstOrderModel.setVisible(True)
             self.secondOrderModel.setVisible(False)
+            self.secondOrderParams.setVisible(False)
         else:
             self.firstOrderModel.setVisible(False)
             self.secondOrderModel.setVisible(True)
+            self.secondOrderParams.setVisible(True)
+
 
 
 
