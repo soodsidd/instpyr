@@ -151,6 +151,9 @@
                 <pointsize>8</pointsize>
                </font>
               </property>
+              <property name="maximum">
+               <double>9999.000000000000000</double>
+              </property>
               <property name="value">
                <double>30.000000000000000</double>
               </property>
@@ -243,7 +246,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>Init             </string>
+                  <string>Init                </string>
                  </property>
                 </widget>
                </item>
@@ -267,7 +270,7 @@
                   </font>
                  </property>
                  <property name="text">
-                  <string>UB             </string>
+                  <string>UB                </string>
                  </property>
                 </widget>
                </item>
@@ -293,6 +296,9 @@
                   <font>
                    <pointsize>8</pointsize>
                   </font>
+                 </property>
+                 <property name="maximum">
+                  <double>9999.000000000000000</double>
                  </property>
                  <property name="value">
                   <double>1.000000000000000</double>
@@ -322,7 +328,7 @@
                   </font>
                  </property>
                  <property name="maximum">
-                  <double>99.989999999999995</double>
+                  <double>9999.000000000000000</double>
                  </property>
                  <property name="value">
                   <double>99.989999999999995</double>
@@ -355,6 +361,9 @@
                  <property name="minimum">
                   <double>0.100000000000000</double>
                  </property>
+                 <property name="maximum">
+                  <double>9999.000000000000000</double>
+                 </property>
                  <property name="value">
                   <double>1.000000000000000</double>
                  </property>
@@ -385,6 +394,9 @@
                  <property name="minimum">
                   <double>0.100000000000000</double>
                  </property>
+                 <property name="maximum">
+                  <double>9999.000000000000000</double>
+                 </property>
                  <property name="value">
                   <double>99.989999999999995</double>
                  </property>
@@ -413,6 +425,9 @@
                    <pointsize>8</pointsize>
                   </font>
                  </property>
+                 <property name="maximum">
+                  <double>9999.000000000000000</double>
+                 </property>
                  <property name="value">
                   <double>0.100000000000000</double>
                  </property>
@@ -436,6 +451,9 @@
                   <font>
                    <pointsize>8</pointsize>
                   </font>
+                 </property>
+                 <property name="maximum">
+                  <double>9999.000000000000000</double>
                  </property>
                  <property name="value">
                   <double>99.989999999999995</double>
@@ -553,6 +571,56 @@
                </item>
               </layout>
              </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <item>
+                <widget class="QLabel" name="label_17">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>RiseTime Weight</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="riseweight">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Settling Weight</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="settlingweight">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
             </layout>
            </widget>
           </item>
@@ -645,7 +713,7 @@
      <x>0</x>
      <y>0</y>
      <width>1230</width>
-     <height>18</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

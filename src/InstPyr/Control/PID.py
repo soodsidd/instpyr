@@ -33,7 +33,9 @@ class PID:
                  Ti_min=0.01,Ti_max=100,
                  Td_min=0.01,Td_max=100,
                  outmin=0,outmax=1000,
-                 overshootweight=0):
+                 overshootweight=0,
+                 risetimeweight=0,
+                 settlingtimeweight=0):
         self.m = GEKKO()
 
         self.tf = tf
@@ -60,11 +62,15 @@ class PID:
         self.SP = self.m.Param(value=self.step)
         self.Intgl = self.m.Var(value=0)
         self.err = self.m.Intermediate(self.SP - self.PV)
-        self.overshoot=self.m.if2(self.err,-self.err,0)
+        self.overshoot=self.m.if2(self.err+0.02*self.SP,-self.err,0)
+        self.risetime=self.m.if2(self.err-0.1*self.SP,0,self.err)
+        self.settlingtime=self.m.if2(self.err-0.2*self.SP,-self.err,0)
+        self.settlingtime=self.settlingtime-self.overshoot
+
         self.m.Equation(self.Intgl.dt() == self.err)
         self.m.Equation(self.OP == self.OP_0 + self.Kc * self.err + (self.Kc / self.Ti) * self.Intgl
                         - self.Kc * self.Td * self.PV.dt())
-        self.m.Obj(self.err ** 2 + overshootweight*self.overshoot)
+        self.m.Obj(self.err ** 2 + overshootweight*self.overshoot**2+risetimeweight*self.risetime**2+settlingtimeweight*self.settlingtime**2)
         # TODO make UI control for overshoot weight
 
         # Process model
@@ -87,6 +93,7 @@ class PID:
         # self.m.options.OTOL=0.5
         PIDvals = collections.namedtuple('PIDvals', ['Kc', 'Ti', 'Td'])
         StepResponse=collections.namedtuple('StepResponse',['time','step','PV','OP'])
+        print(self.overshoot.value)
 
         try:
             self.m.solve()

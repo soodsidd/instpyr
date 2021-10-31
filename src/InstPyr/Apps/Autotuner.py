@@ -64,7 +64,9 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
                                           self.TiLb,self.TiUb,
                                           self.TdLb,self.TdUb,
                                           self.outmin,self.outmax,
-                                          self.doubleSpinBox.value())
+                                          self.doubleSpinBox.value(),
+                                          self.riseweight.value(),
+                                          self.settlingweight.value())
                 print('Kc: ' + str(pidv.Kc))
                 print('Ti: ' + str(pidv.Ti))
                 print('Td: ' + str(pidv.Td))
