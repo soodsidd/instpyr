@@ -208,10 +208,12 @@ class MyPlotter:
             for key in list(self.pltdata.keys()):
                 self.pltdata[key].xdata=[]
                 self.pltdata[key].ydata=[]
+                self.pltdata[key].plotlen=0
         else:
             if key in list(self.pltdata.keys()):
                 self.pltdata[key].xdata = []
                 self.pltdata[key].ydata = []
+                self.pltdata[key].plotlen=0
 
     def redraw(self):
         # update plot here

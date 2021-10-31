@@ -233,7 +233,7 @@ class TF_identificator:
             dynamicsratio=np.linspace(3,dynamicsratiomax,100)
             bestfit={}
             bestratio=0
-            minres=1000
+            minres=1000000000
             for j in range(len(dynamicsratio)):
                 #TODO optimize minimization function
                 section=int((len(time)-1)/dynamicsratio[j])
@@ -293,9 +293,9 @@ class TF_identificator:
 
             # print(res)
             return bestfit
-
-    def calculate_residual(self,output,sim):
-        err = [x - y for x, y in zip(output / np.max(output), sim / (np.max(sim)))]
+    @classmethod
+    def calculate_residual(cls,output,sim):
+        err = [x - y for x, y in zip(output, sim)]
         res = sum(map(lambda i: i * i, err))
         return res
 
