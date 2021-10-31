@@ -47,7 +47,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #setup interface and devices
         # self.interface=myMcc.myMcc()
-        self.motor=Plant.Plant([1],[1,100])
+        self.motor=Plant.Plant([179],[579,1])
         self.interface=simulator.simulator()
 
         #create a simulated system based on a transfer function
@@ -78,19 +78,24 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
 
         #sensors
-        self.sensors['motoroutput_k']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
+        self.sensors['output_k']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
+        self.sensors['setpoint_k'] = watch.watch('Setpoint', nameof(self.setpoint), callfunc=self.variableProbe)
+        self.sensors['error_k'] = watch.watch('Error signal', nameof(self.error), callfunc=self.variableProbe)
         self.sensors['controlsignal_k']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
-        self.sensors['setpoint_k']=watch.watch('Setpoint',nameof(self.setpoint),callfunc=self.variableProbe)
-        self.sensors['error_k']=watch.watch('Error signal',nameof(self.error),callfunc=self.variableProbe)
         self.sensors['P_k']=watch.watch('P contribution',nameof(self.P),callfunc=self.variableProbe)
         self.sensors['I_k']=watch.watch('I contribution',nameof(self.I),callfunc=self.variableProbe)
+        self.sensors['D_k']=watch.watch('D contribution',nameof(self.I),callfunc=self.variableProbe)
+
+        self.mainplotvars=['output_k','setpoint_k','error_k']
+        self.controlplotvars=['controlsignal_k','P_k','I_k','D_k']
 
         # self.sensors['controlsignal']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
 
 
         #setup widgets
-        self.plot=Plotter.MyPlotter(self.plot, initdata={self.sensors[x].name:[] for x in self.sensors.keys()},buffersize=1000,oneaxis=True,datetimeaxis=False)
-        # self.plot.addLine('MovingAvgFilter')
+        self.mainplot=Plotter.MyPlotter(self.Mainplot, initdata={self.sensors[x].name:[] for x in self.mainplotvars},buffersize=10000,oneaxis=True,datetimeaxis=False)
+        self.controlplot=Plotter.MyPlotter(self.Controlplot, initdata={self.sensors[x].name:[] for x in self.controlplotvars},buffersize=10000,oneaxis=True,datetimeaxis=False)
+
 
 
         for key in self.sensors.keys():
@@ -128,26 +133,39 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.controlsignal=self.pidcontroller.apply(self.error,self.currentTime)
         self.P=self.pidcontroller.P
         self.I=self.pidcontroller.I
+        self.D=self.pidcontroller.D
 
 
-        data=[self.currentTime]+[x.read() for x in self.sensors.values()]#[datetime.now()]
+
+        data={}
+        for key in self.sensors.keys():
+            data[self.sensors[key].name]=[self.currentTime,self.sensors[key].read()]
         self.dispQueue.put(data)
+        logdata=[datetime.now()]+[x.read() for x in self.sensors.values()]
+
         if self.logEnable:
             try:
-                event=self.eventQueue.get(timeout=0.1)
-                self.logQueue.put(data+[event])
+                event = self.eventQueue.get(timeout=0.1)
+                self.logQueue.put(logdata + [event])
             except Exception:
-                self.logQueue.put(data)
-
+                self.logQueue.put(logdata)
 
 
 
     def update_display(self):
         while(True):
             data=self.dispQueue.get(timeout=1000)
+            #data is a dictionary
             self.dispQueue.task_done()
-            self.plot.updatedata(data)
-            self.plot.redraw()
+            mainplotarray=[self.sensors[x].name for x in self.mainplotvars]
+            controlplotarray=[self.sensors[x].name for x in self.controlplotvars]
+            for key in data.keys():
+                if key in mainplotarray:
+                    self.mainplot.updatedata({key:data[key]})
+                elif key in controlplotarray:
+                    self.controlplot.updatedata({key:data[key]})
+            self.mainplot.redraw()
+            self.controlplot.redraw()
 
     def logdata(self):
         while True:
@@ -206,14 +224,17 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
                 if self.logger is not None:
                     self.logger.close()
         if name=='Buffersize':
-            self.plot.buffer=int(self.Buffersize.value()*self.Sampling.value())
+            self.mainplot.buffer=int(self.Buffersize.value()*self.Sampling.value())
+            self.controlplot.buffer=int(self.Buffersize.value()*self.Sampling.value())
+
             self.statusmsg.emit('Changed show last')
         if name=='Sampling':
             # self.timer.stop()
             self.timer.setInterval(int(1000/self.Sampling.value()))
-            self.statusmsg.emit('Changed sampling rate')
+            # self.statusmsg.emit('Changed sampling rate')
         if name=='clear':
-            self.plot.clear()
+            self.mainplot.clear()
+            self.controlplot.clear()
         if name=='MainWindow':
             self.statusbar_2.setText(args[0])
         if name=='annotate':
@@ -224,8 +245,10 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
             self.annotatemsg.setText('')
 
         if name=='horZoom':
-            self.plot.buffer=int(10000*self.horZoom.value()/100)
-            print(self.plot.buffer)
+            self.mainplot.buffer=int(10000*self.horZoom.value()/100)
+            self.controlplot.buffer=int(10000*self.horZoom.value()/100)
+
+            print(self.mainplot.buffer)
 
         if name=='Setpoint':
             self.setpoint=self.Setpoint.value()
@@ -235,7 +258,10 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
             self.pidcontroller.Kp=self.Kp.value()
 
         if name=='Ti':
-            self.pidcontroller.Ki=self.Kp.value()/self.Ti.value()
+            try:
+                self.pidcontroller.Ki=self.Kp.value()/self.Ti.value()
+            except Exception:
+                print('bad Ti value')
 
         if name=='Td':
             self.pidcontroller.Kd=self.Kp.value()*self.Td.value()
@@ -255,13 +281,21 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
 
         if name in self.var_checkboxes:
+            mainplotarray = [self.sensors[x].name for x in self.mainplotvars]
+            controlplotarray = [self.sensors[x].name for x in self.controlplotvars]
             exec("self.cname=self."+name)
             # print(name)
             # dispname=self.skbot.text()
-            if self.cname.isChecked():
-                self.plot.show(self.cname.text())
-            else:
-                self.plot.hide(self.cname.text())
+            if self.cname.text() in mainplotarray:
+                if self.cname.isChecked():
+                    self.mainplot.show(self.cname.text())
+                else:
+                    self.mainplot.hide(self.cname.text())
+            elif self.cname.text() in controlplotarray:
+                if self.cname.isChecked():
+                    self.controlplot.show(self.cname.text())
+                else:
+                    self.controlplot.hide(self.cname.text())
             # pass
 
             #TODO - annotate at any timestamp
