@@ -423,6 +423,8 @@ class Ui_MainWindow(object):
         self.squareperiod.valueChanged['double'].connect(MainWindow.eventHandler)
         self.squareamp.valueChanged['double'].connect(MainWindow.eventHandler)
         self.squaregen.toggled['bool'].connect(MainWindow.eventHandler)
+        self.instrumentList.currentIndexChanged['int'].connect(MainWindow.eventHandler)
+        self.instConnect.clicked.connect(MainWindow.eventHandler)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
