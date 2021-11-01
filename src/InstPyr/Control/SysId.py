@@ -25,12 +25,14 @@ class TF_identificator:
         to, yo, xo = sig.lsim2(tf, U=input, T=t)
         return yo
 
-    def _first_order_mdl(self, t, k, pole):
-        return TF_identificator.first_order_mdl(t,self.inputs,k, pole)
+    def first_order_mdl_N(self, t, k, pole):
+        self.tf = sig.TransferFunction(k, [pole, 1])
+        to, yo, xo = sig.lsim2(self.tf, U=self.inputs, T=t)
+        return yo
 
     @classmethod
-    def second_order_mdl(cls,t, input, k, wn, delta):
-        tf = sig.TransferFunction(k*(wn**2), [1, 2*delta*wn, wn**2])
+    def second_order_mdl(cls,t, input,zero, k, wn, delta):
+        tf = sig.TransferFunction([k*(wn**2),k*(wn**2)*zero], [1, 2*delta*wn, wn**2])
         to, yo, xo = sig.lsim2(tf, U=input, T=t)
         return yo
 
@@ -43,11 +45,11 @@ class TF_identificator:
 
     def identify_first_order(self, t, u, orig_output, method='lm', p0=[1.0, 1.0]):
         self.inputs = u
-        params, params_cov = opt.curve_fit(self._first_order_mdl, t, orig_output,
+        params, params_cov = opt.curve_fit(self.first_order_mdl_N, t, orig_output,
                                            method=method, maxfev=1000, p0=p0)
         print(params_cov)
-        simout=TF_identificator.first_order_mdl(time,input,params[0],params[1])
-        res=self.calculate_residual(output,simout)
+        simout=TF_identificator.first_order_mdl(t,u,params[0],params[1])
+        res=self.calculate_residual(orig_output,simout)
 
         return {'k': params[0], 'tau': params[1],'sim':simout,'res':res}
 
