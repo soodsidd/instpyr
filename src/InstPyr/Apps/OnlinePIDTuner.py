@@ -101,6 +101,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         for key in self.sensors.keys():
             self.var_checkboxes+=[self.addCheckbox(self.sensors[key].name,key)]
         self.statusmsg.connect(self.eventHandler)
+        self.instrumentList.addItems(['this','that'])
 
 
 

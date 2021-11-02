@@ -99,8 +99,11 @@
               <property name="decimals">
                <number>2</number>
               </property>
+              <property name="minimum">
+               <double>-15.000000000000000</double>
+              </property>
               <property name="maximum">
-               <double>99999.000000000000000</double>
+               <double>120.000000000000000</double>
               </property>
               <property name="value">
                <double>0.000000000000000</double>
@@ -264,6 +267,9 @@
                    <pointsize>8</pointsize>
                   </font>
                  </property>
+                 <property name="maximum">
+                  <double>99999.000000000000000</double>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -288,6 +294,12 @@
                   <font>
                    <pointsize>8</pointsize>
                   </font>
+                 </property>
+                 <property name="minimum">
+                  <double>-40.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>95.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -602,6 +614,12 @@ p, li { white-space: pre-wrap; }
                <property name="text">
                 <string>Connect</string>
                </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+               <property name="checked">
+                <bool>false</bool>
+               </property>
               </widget>
              </item>
              <item>
@@ -721,7 +739,7 @@ p, li { white-space: pre-wrap; }
  <connections>
   <connection>
    <sender>Buffersize</sender>
-   <signal>valueChanged(double)</signal>
+   <signal>editingFinished()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
@@ -737,7 +755,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>Sampling</sender>
-   <signal>valueChanged(double)</signal>
+   <signal>editingFinished()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
@@ -817,7 +835,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>Setpoint</sender>
-   <signal>valueChanged(double)</signal>
+   <signal>editingFinished()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
@@ -833,7 +851,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>Kp</sender>
-   <signal>valueChanged(double)</signal>
+   <signal>editingFinished()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
@@ -849,7 +867,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>Td</sender>
-   <signal>valueChanged(double)</signal>
+   <signal>editingFinished()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
@@ -865,7 +883,7 @@ p, li { white-space: pre-wrap; }
   </connection>
   <connection>
    <sender>Ti</sender>
-   <signal>valueChanged(double)</signal>
+   <signal>editingFinished()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
