@@ -2,6 +2,7 @@
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSignal
 from matplotlib.figure import Figure
+import matplotlib.ticker as mticker
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib as mpl
@@ -15,6 +16,7 @@ class MplCanvas(Canvas):
         self.fig = Figure()
         self.ax = self.fig.add_subplot(111)
         self.ax.minorticks_on()
+        mticker.Locator.MAXTICKS=10000000
         self.ax.grid(b=True, which='major', color='silver', linestyle='-')
         self.ax.grid(b=True, which='minor', color='gainsboro', linestyle='--')
         self.fig.tight_layout()
