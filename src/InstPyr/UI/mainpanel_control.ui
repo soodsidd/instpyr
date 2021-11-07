@@ -236,6 +236,92 @@
            </layout>
           </item>
           <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <item>
+             <widget class="QLabel" name="label_18">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Out_min</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="Minout">
+              <property name="maximumSize">
+               <size>
+                <width>53</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>-999.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>999.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>0.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_16">
+            <item>
+             <widget class="QLabel" name="label_17">
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>Out_max</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="Maxout">
+              <property name="maximumSize">
+               <size>
+                <width>53</width>
+                <height>20</height>
+               </size>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>8</pointsize>
+               </font>
+              </property>
+              <property name="decimals">
+               <number>3</number>
+              </property>
+              <property name="minimum">
+               <double>-999.000000000000000</double>
+              </property>
+              <property name="maximum">
+               <double>999.000000000000000</double>
+              </property>
+              <property name="value">
+               <double>1.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <widget class="QGroupBox" name="groupBox_2">
             <property name="font">
              <font>
@@ -318,6 +404,169 @@
             </layout>
            </widget>
           </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="title">
+             <string>Autotune</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_15">
+               <item>
+                <widget class="QLabel" name="label_15">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Setpoint</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="autotuneSetpoint">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="maximum">
+                  <double>99999.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <item>
+                <widget class="QLabel" name="label_14">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>ControlAmp</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="autotuneControlAmp">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="maximum">
+                  <double>99999.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_13">
+               <item>
+                <widget class="QLabel" name="label_13">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Cycles</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="autotuneCycles">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="decimals">
+                  <number>0</number>
+                 </property>
+                 <property name="maximum">
+                  <double>10.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>5.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_16">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="text">
+                <string>Method:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="AutotuneMethod">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                </font>
+               </property>
+               <property name="currentIndex">
+                <number>3</number>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Zieg-Nc-P</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Zieg-Nc-PI</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Zieg-Nc-PID</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Tyr-Luy-PI</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Tyr-Luy-PID</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="AutotuneEnable">
+               <property name="text">
+                <string>Autotune!</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -340,46 +589,6 @@
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <widget class="QLabel" name="label">
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>Show Last (Seconds)</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QDoubleSpinBox" name="Buffersize">
-                <property name="maximumSize">
-                 <size>
-                  <width>53</width>
-                  <height>20</height>
-                 </size>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                 </font>
-                </property>
-                <property name="decimals">
-                 <number>0</number>
-                </property>
-                <property name="maximum">
-                 <double>99999.000000000000000</double>
-                </property>
-                <property name="value">
-                 <double>1000.000000000000000</double>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_3">
               <item>
@@ -631,7 +840,7 @@ p, li { white-space: pre-wrap; }
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>                                                                                                                                   </string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -710,7 +919,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1230</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -738,30 +947,14 @@ p, li { white-space: pre-wrap; }
  <resources/>
  <connections>
   <connection>
-   <sender>Buffersize</sender>
-   <signal>editingFinished()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>eventHandler()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>189</x>
-     <y>383</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>230</x>
-     <y>35</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>Sampling</sender>
    <signal>editingFinished()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>189</x>
-     <y>411</y>
+     <x>182</x>
+     <y>619</y>
     </hint>
     <hint type="destinationlabel">
      <x>232</x>
@@ -776,8 +969,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>190</x>
-     <y>603</y>
+     <x>183</x>
+     <y>785</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
@@ -792,8 +985,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>180</x>
-     <y>442</y>
+     <x>184</x>
+     <y>650</y>
     </hint>
     <hint type="destinationlabel">
      <x>156</x>
@@ -808,8 +1001,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1051</x>
-     <y>816</y>
+     <x>1050</x>
+     <y>815</y>
     </hint>
     <hint type="destinationlabel">
      <x>1066</x>
@@ -840,8 +1033,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>190</x>
-     <y>105</y>
+     <x>181</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
      <x>162</x>
@@ -856,8 +1049,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>190</x>
-     <y>133</y>
+     <x>183</x>
+     <y>131</y>
     </hint>
     <hint type="destinationlabel">
      <x>285</x>
@@ -872,8 +1065,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>190</x>
-     <y>161</y>
+     <x>183</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
      <x>345</x>
@@ -888,8 +1081,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>190</x>
-     <y>189</y>
+     <x>183</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>487</x>
@@ -904,8 +1097,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>180</x>
-     <y>243</y>
+     <x>173</x>
+     <y>294</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -920,8 +1113,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>180</x>
-     <y>271</y>
+     <x>173</x>
+     <y>321</y>
     </hint>
     <hint type="destinationlabel">
      <x>169</x>
@@ -936,8 +1129,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>168</x>
-     <y>302</y>
+     <x>174</x>
+     <y>352</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -968,12 +1161,60 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>445</x>
-     <y>68</y>
+     <x>559</x>
+     <y>83</y>
     </hint>
     <hint type="destinationlabel">
      <x>221</x>
      <y>246</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AutotuneEnable</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>139</x>
+     <y>532</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>446</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Maxout</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>152</x>
+     <y>230</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>279</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Minout</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>151</x>
+     <y>209</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>208</x>
+     <y>221</y>
     </hint>
    </hints>
   </connection>

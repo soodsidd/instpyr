@@ -2,14 +2,27 @@ import numpy as np
 from gekko import GEKKO
 from scipy.signal import tf2ss
 import collections
+import math
+import time
+from dataclasses import dataclass
+
+@dataclass
+class MethodList:
+    ZN_P=0
+    ZN_PI=1
+    ZN_PID=2
+    TL_PI=3
+    TL_PID=4
 
 
 class PID:
-    def __init__(self,Kp,Ki,Kd,out_min=-999999,out_max=999999):
+    def __init__(self,Kp,Ki,Kd, out_min=-999999,out_max=999999):
         self.Kp=Kp
         self.Ki=Ki
         self.Kd=Kd
         self.limits=[out_min,out_max]
+        self.outmax=out_max
+        self.outmin=out_min
         self.e_prev=0
         self.t_prev=-0.001
         self.I=0
@@ -18,14 +31,43 @@ class PID:
 
     def apply(self,error,t):
         self.P=self.Kp*error
-        self.I=self.I+self.Ki*error*(t-self.t_prev)
         self.D=self.Kd*(error-self.e_prev)/(t-self.t_prev)
+        self.e_prev = error
+        self.integral(error,t)
+        self.t_prev = t
 
-        self.e_prev=error
-        self.t_prev=t
+
+
 
         output=self.P+self.I+self.D
-        return np.max([np.min([output,self.limits[1]]),self.limits[0]])
+        return np.max([np.min([output,self.outmax]),self.outmin])
+
+    def integral(self,error,t):
+        if self.Ki!=0:
+            self.Imax=(self.outmax-self.P-self.D)/self.Ki
+            self.Imin=(self.outmin-self.P-self.D)/self.Ki
+            change=self.Ki*error*(t-self.t_prev)
+            self.I=self.I+change
+
+            if error>0:
+                if self.Imax>0:
+                    if (self.I>self.Imax):
+                        self.I=self.Imax
+                else:
+                    self.I-=change
+
+            else:
+                if self.Imin<0:
+                    if (self.I<self.Imin):
+                        self.I=self.Imin
+                else:
+                    self.I -= change
+        else:
+            self.I=0
+
+
+
+
 
     @classmethod
     def autotune(self,tf_num, tf_den, tf,steps,amp,
@@ -104,13 +146,131 @@ class PID:
             print("no solution found")
             return 0
 
+class PIDAutotuneRT:
+    def __init__(self, Y0,a,method=MethodList.TL_PI,cycles=5):
+        """
+        Autotuner based on relay feedback method
+        Parameters
+        ----------
+                Y0 : float
+                    Setpoint
+                a : float
+                    Amplitude of control signal
+        """
+
+        self.OP=np.array([])
+        self.PV=np.array([])
+        self.Err=np.array([])
+        self.sampling=0
+        self.currentTime=0
+        self.ready=False
+        self.currentOutput=a
+        self.cycles=cycles
+        self.zerocrosses=0
+        self.zerocrossingindices=np.array([])
+        self.setpoint=Y0
+        self.OPamp=a
+        self.method=method
+
+    def nextVal(self,currentPV,currentOP):
+        if self.currentTime==0:
+            self.currentTime=time.time()
+        else:
+            self.sampling=time.time()-self.currentTime
+            self.currentTime=time.time()
+            self.PV=np.append(self.PV,currentPV)
+            self.Err=np.append(self.Err,self.setpoint-currentPV)
+            zerocrossings=self._zeroCrossings()
+            print(zerocrossings)
+            if zerocrossings>self.zerocrosses:
+                self._toggleOutput()
+                self.zerocrosses+=1
+                if self.zerocrosses>2*self.cycles:
+                    self.ready=True
+            self.OP=np.append(self.OP,self.currentOutput)
+
+        return self.currentOutput
+
+    def outputReady(self):
+        return self.ready
+
+    def PIDparameters(self):
+        if self.ready:
+            b,Tu=self._calculateInputs()
+            print(b)
+            print(Tu)
+            Ku = (4 / math.pi) * (self.OPamp / b)
+            Td=0
+            Ti=9999
+            Kc=0
+            if self.method==0:
+                Kc=Ku/2
+            elif self.method==1:
+                Kc=Ku/2.2
+                Ti=Tu/1.2
+            elif self.method==2:
+                Kc=Ku/1.7
+                Ti=Tu/2
+                Td=Tu/8
+            elif self.method==3:
+                Kc=Ku/3.2
+                Ti=2.2*Tu
+            elif self.method==4:
+                Kc=Ku/2.2
+                Ti=2.2*Tu
+                Td=Tu/6.3
+
+            return {'Kc': Kc, 'Ti':Ti,'Td':Td}
+        else:
+            return {'Kc':0,'Ti':9999,'Td':0}
+
+    def _toggleOutput(self):
+        if self.currentOutput==0:
+            self.currentOutput=self.OPamp
+        else:
+            self.currentOutput=0
+
+
+    def _zeroCrossings(self):
+        if np.any(self.Err):
+            Err_nosmall=self.Err[(self.Err>0.01*self.setpoint)|(self.Err<-0.01*self.setpoint)]
+            self.zerocrossingindices=np.where(np.diff(np.sign(Err_nosmall)))[0]
+            return len(self.zerocrossingindices)
+        else:
+            return 0
+
+    def _calculateInputs(self):
+        #remove all elements before first zero crossing index:
+        for i in range(self.zerocrossingindices[0]):
+            self.PV=np.delete(self.PV, 0)
+        b=np.max(self.PV)-np.min(self.PV)
+        diff=np.array([])
+        for i in range(len(self.zerocrossingindices)-1):
+            diff=np.append(diff,self.zerocrossingindices[i+1]-self.zerocrossingindices[i])
+
+        # diff=PIDAutotuneRT.reject_outliers(diff)
+        Tu=2*np.mean(diff)*self.sampling
+
+        return b,Tu
+
+    @classmethod
+    def reject_outliers(cls,data, m=2.):
+        d = np.abs(data - np.median(data))
+        mdev = np.median(d)
+        s = d / mdev if mdev else 0.
+        return data[s < m]
+
+
+
+
+
 
 if __name__=="__main__":
     # pid=PID(1,1,1,0,10)
     # t=np.linspace(0,10,100)
     # print(pid.apply(1,0.5))
 
-
+    # Autotune=PIDAutotune()
 
 
 
