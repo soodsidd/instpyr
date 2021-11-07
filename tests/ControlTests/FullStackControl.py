@@ -47,7 +47,8 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #setup interface and devices
         # self.interface=myMcc.myMcc()
-        self.motor=Plant.Plant([6954154,179],[49370544,71435,1])
+        # self.motor=Plant.Plant([6954154,179],[49370544,71435,1])
+        self.motor=Plant.Plant([1],[1,0.5,1])
         self.interface=simulator.simulator()
 
         #create a simulated system based on a transfer function
@@ -73,6 +74,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.controlsignal=0
         self.P=0
         self.I=0
+        self.D=0
         self.squarewave=Waveform.square(self.samplingrate/1000,30,5,-5)
         self.osc_setpoint=False
         self.PIDAutotuner=None
@@ -86,7 +88,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.sensors['controlsignal_k']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
         self.sensors['P_k']=watch.watch('P contribution',nameof(self.P),callfunc=self.variableProbe)
         self.sensors['I_k']=watch.watch('I contribution',nameof(self.I),callfunc=self.variableProbe)
-        self.sensors['D_k']=watch.watch('D contribution',nameof(self.I),callfunc=self.variableProbe)
+        self.sensors['D_k']=watch.watch('D contribution',nameof(self.D),callfunc=self.variableProbe)
 
         self.mainplotvars=['output_k','setpoint_k','error_k']
         self.controlplotvars=['controlsignal_k','P_k','I_k','D_k']
