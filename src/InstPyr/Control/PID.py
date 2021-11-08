@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 
 ATSETTLINGTIME=10
+ZEROCROSSINGTOL=0.01
 
 @dataclass
 class MethodList:
@@ -200,8 +201,6 @@ class PIDAutotuneRT:
             self.sampling=time.time()-self.currentTime
             self.currentTime=time.time()
             if self.status==TuningStatus.COARSE_RELAY or self.status==TuningStatus.FINE_RELAY:
-                # if (time.time()-self.postTime)>ATSETTLINGTIME and self.postTime!=0:
-                #
                 self.PV=np.append(self.PV,currentPV)
                 self.Err=np.append(self.Err,self.setpoint-currentPV)
                 zerocrossings=self._zeroCrossings()
@@ -297,7 +296,7 @@ class PIDAutotuneRT:
 
     def _zeroCrossings(self):
         if np.any(self.Err):
-            Err_nosmall=self.Err[(self.Err>0.01*self.setpoint)|(self.Err<-0.01*self.setpoint)]
+            Err_nosmall=self.Err[(self.Err>ZEROCROSSINGTOL*self.setpoint)|(self.Err<-ZEROCROSSINGTOL*self.setpoint)]
             self.zerocrossingindices=np.where(np.diff(np.sign(Err_nosmall)))[0]
             return len(self.zerocrossingindices)
         else:

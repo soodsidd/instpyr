@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>1230</width>
-    <height>863</height>
+    <height>890</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Temperature Logger</string>
+   <string>Online PID Tuner</string>
   </property>
   <property name="windowIcon">
    <iconset>

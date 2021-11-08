@@ -15,7 +15,7 @@ from .CustomWidgets.mplwidget import MplWidget
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1230, 863)
+        MainWindow.resize(1230, 890)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../../../../TemperatureLogger/img/temperature.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -555,7 +555,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Temperature Logger"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Online PID Tuner"))
         self.Control.setTitle(_translate("MainWindow", "Control"))
         self.label_9.setText(_translate("MainWindow", "Setpoint"))
         self.label_5.setText(_translate("MainWindow", "Kp"))
