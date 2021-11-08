@@ -82,14 +82,14 @@ class PID:
 
 
     @classmethod
-    def autotune(self,tf_num, tf_den, tf,steps,amp,
-                 Kc_min=0.01, Kc_max=100,
-                 Ti_min=0.01,Ti_max=100,
-                 Td_min=0.01,Td_max=100,
-                 outmin=0,outmax=1000,
-                 overshootweight=0,
-                 risetimeweight=0,
-                 settlingtimeweight=0):
+    def autotune_offline(self, tf_num, tf_den, tf, steps, amp,
+                         Kc_min=0.01, Kc_max=100,
+                         Ti_min=0.01, Ti_max=100,
+                         Td_min=0.01, Td_max=100,
+                         outmin=0, outmax=1000,
+                         overshootweight=0,
+                         risetimeweight=0,
+                         settlingtimeweight=0):
         self.m = GEKKO()
 
         self.tf = tf
@@ -340,6 +340,6 @@ if __name__=="__main__":
 
     # for i in range(len(t)):
     #     next(pid.apply())
-    pid,res=PID.autotune([1],[1,10],30,100,1)
+    pid,res=PID.autotune_offline([1], [1, 10], 30, 100, 1)
     print(pid)
     print(res)

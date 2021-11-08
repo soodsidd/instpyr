@@ -58,15 +58,15 @@ class MainWindow(QMainWindow,mainpanel_autotuner.Ui_MainWindow):
             self.parsePID()
             try:
                 #TODO make separate thread for this
-                pidv,res=PID.PID.autotune(self.TF_num,self.TF_den,self.simDuration.value(),self.timeSteps.value(),
-                                          self.stepAmp.value(),
-                                          self.KcLb, self.KcUb,
-                                          self.TiLb,self.TiUb,
-                                          self.TdLb,self.TdUb,
-                                          self.outmin,self.outmax,
-                                          self.doubleSpinBox.value(),
-                                          self.riseweight.value(),
-                                          self.settlingweight.value())
+                pidv,res=PID.PID.autotune_offline(self.TF_num, self.TF_den, self.simDuration.value(), self.timeSteps.value(),
+                                                  self.stepAmp.value(),
+                                                  self.KcLb, self.KcUb,
+                                                  self.TiLb, self.TiUb,
+                                                  self.TdLb, self.TdUb,
+                                                  self.outmin, self.outmax,
+                                                  self.doubleSpinBox.value(),
+                                                  self.riseweight.value(),
+                                                  self.settlingweight.value())
                 print('Kc: ' + str(pidv.Kc))
                 print('Ti: ' + str(pidv.Ti))
                 print('Td: ' + str(pidv.Td))
