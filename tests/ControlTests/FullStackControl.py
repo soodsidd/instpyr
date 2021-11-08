@@ -47,7 +47,8 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #setup interface and devices
         # self.interface=myMcc.myMcc()
-        self.motor=Plant.Plant([6954154,179],[49370544,71435,1])
+        # self.motor=Plant.Plant([6954154,179],[49370544,71435,1])
+        self.motor=Plant.Plant([1,1],[1,0.5,0.5,1])
         # self.motor=Plant.Plant([1],[10,1])
         # self.motor=Plant.Plant([1],[1,0.5,1])
         self.interface=simulator.simulator()
