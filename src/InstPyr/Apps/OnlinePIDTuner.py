@@ -47,12 +47,14 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #setup interface and devices
         # self.interface=myMcc.myMcc()
-        self.motor=Plant.Plant([179],[579,1])
+        self.motor=Plant.Plant([6954154,179],[49370544,71435,1])
+        # self.motor=Plant.Plant([1],[10,1])
+        # self.motor=Plant.Plant([1],[1,0.5,1])
         self.interface=simulator.simulator()
 
         #create a simulated system based on a transfer function
 
-        self.pidcontroller=PID.PID(0,0,0) #unbounded PID
+        self.pidcontroller=PID.PID(self.Kp.value(),self.Kp.value()/self.Ti.value(),self.Kp.value()*self.Td.value(),out_min=self.Minout.value(),out_max=self.Maxout.value()) #unbounded PID
 
 
         self.sensors={}
@@ -60,8 +62,8 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
 
         #variables
         self.logger = None
-        self.buffersize = self.Buffersize.value()
-        self.samplingrate = 100  # int(1000/self.Sampling.value())
+        self.buffersize = 1000# self.Buffersize.value()
+        self.samplingrate = 500  # int(1000/self.Sampling.value())
         self.logfilename = ''
         self.logEnable = False
 
@@ -73,9 +75,13 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.controlsignal=0
         self.P=0
         self.I=0
+        self.D=0
         self.squarewave=Waveform.square(self.samplingrate/1000,30,5,-5)
         self.osc_setpoint=False
-
+        self.PIDAutotuner=None
+        self.minout=self.Minout.value()
+        self.maxout=self.Maxout.value()
+        self.ATstatus=None
 
         #sensors
         self.sensors['output_k']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
@@ -84,7 +90,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.sensors['controlsignal_k']=watch.watch('Control Signal',nameof(self.controlsignal),callfunc=self.variableProbe)
         self.sensors['P_k']=watch.watch('P contribution',nameof(self.P),callfunc=self.variableProbe)
         self.sensors['I_k']=watch.watch('I contribution',nameof(self.I),callfunc=self.variableProbe)
-        self.sensors['D_k']=watch.watch('D contribution',nameof(self.I),callfunc=self.variableProbe)
+        self.sensors['D_k']=watch.watch('D contribution',nameof(self.D),callfunc=self.variableProbe)
 
         self.mainplotvars=['output_k','setpoint_k','error_k']
         self.controlplotvars=['controlsignal_k','P_k','I_k','D_k']
@@ -101,7 +107,6 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         for key in self.sensors.keys():
             self.var_checkboxes+=[self.addCheckbox(self.sensors[key].name,key)]
         self.statusmsg.connect(self.eventHandler)
-        self.instrumentList.addItems(['this','that'])
 
 
 
@@ -131,10 +136,38 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         if self.osc_setpoint:
             self.setpoint=self.squarewave.nextval()
         self.error=self.setpoint-self.motoroutput
-        self.controlsignal=self.pidcontroller.apply(self.error,self.currentTime)
-        self.P=self.pidcontroller.P
-        self.I=self.pidcontroller.I
-        self.D=self.pidcontroller.D
+        self.controlsignal = self.pidcontroller.apply(self.error, self.currentTime)
+        self.P = self.pidcontroller.P
+        self.I = self.pidcontroller.I
+        self.D = self.pidcontroller.D
+        if self.PIDAutotuner is not None:
+            control, self.ATstatus = self.PIDAutotuner.nextVal(self.motoroutput, self.controlsignal)
+
+            if self.ATstatus==PID.TuningStatus.COARSE_SETTLING:
+                pass
+            elif self.ATstatus==PID.TuningStatus.COARSE_READY or self.ATstatus==PID.TuningStatus.FINE_READY:
+                params = self.PIDAutotuner.PIDparameters()
+                self.Kp.setValue(params['Kc'])
+                self.Ti.setValue(params['Ti'])
+                self.Td.setValue(params['Td'])
+                self.pidcontroller = PID.PID(params['Kc'], params['Kc'] / params['Ti'], params['Kc'] * params['Td'],
+                                             out_min=self.minout, out_max=self.maxout)
+                self.setpoint = self.autotuneSetpoint.value()
+
+                if self.ATstatus==PID.TuningStatus.FINE_READY:
+                    self.AutotuneEnable.setText('Autotune!')
+                    self.AutotuneEnable.setChecked(False)
+                    self.PIDAutotuner = None
+
+            elif self.ATstatus==PID.TuningStatus.COARSE_RELAY or self.ATstatus==PID.TuningStatus.FINE_RELAY:
+                self.controlsignal=control
+
+            elif self.ATstatus==PID.TuningStatus.DWELL:
+                self.controlsignal=control
+
+        print(self.ATstatus)
+
+
 
 
 
@@ -267,6 +300,13 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         if name=='Td':
             self.pidcontroller.Kd=self.Kp.value()*self.Td.value()
 
+        if name=='Maxout':
+            self.pidcontroller.outmax=self.Maxout.value()
+            self.maxout=self.Maxout.value()
+
+        if name=='Minout':
+            self.pidcontroller.outmin=self.Minout.value()
+            self.minout=self.Minout.value()
 
         if name=='squaregen':
             if self.squaregen.isChecked():
@@ -279,7 +319,18 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
                 self.squaregen.setText('Generate')
                 self.osc_setpoint=False
 
+        if name=='AutotuneEnable':
+            if self.AutotuneEnable.isChecked():
+                self.PIDAutotuner=PID.PIDAutotuneRT(self.autotuneSetpoint.value(),self.autotuneControlAmp.value(),self.autotuneControlFineAmp.value(), cycles=self.autotuneCycles.value(),method=self.AutotuneMethod.currentIndex())
 
+                self.AutotuneEnable.setText('Autotuning')
+                self.ATstatus=PID.TuningStatus.COARSE_RELAY
+                self.autoTuneUI_update(True)
+            else:
+                self.PIDAutotuner=None
+                self.AutotuneEnable.setText('Autotune!')
+                self.ATstatus=0
+                self.autoTuneUI_update(False)
 
         if name in self.var_checkboxes:
             mainplotarray = [self.sensors[x].name for x in self.mainplotvars]
@@ -318,6 +369,15 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.checkboxname.stateChanged['int'].connect(self.eventHandler)
         self.checkboxcount+=1
         return varname
+
+    def autoTuneUI_update(self,disable:bool):
+            self.groupBox_2.setDisabled(disable)
+            self.autotuneSetpoint.setDisabled(disable)
+            self.autotuneControlAmp.setDisabled(disable)
+            self.autotuneControlFineAmp.setDisabled(disable)
+            self.autotuneCycles.setDisabled(disable)
+            self.Setpoint.setDisabled(disable)
+
 
 
     def variableProbe(self,name):

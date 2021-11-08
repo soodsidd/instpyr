@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1230</width>
-    <height>857</height>
+    <height>863</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -459,6 +459,34 @@
                </item>
                <item>
                 <widget class="QDoubleSpinBox" name="autotuneControlAmp">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="maximum">
+                  <double>99999.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_18">
+               <item>
+                <widget class="QLabel" name="label_19">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>FineAmp</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="autotuneControlFineAmp">
                  <property name="font">
                   <font>
                    <pointsize>8</pointsize>

@@ -6,6 +6,9 @@ import math
 import time
 from dataclasses import dataclass
 
+
+ATSETTLINGTIME=10
+
 @dataclass
 class MethodList:
     ZN_P=0
@@ -14,6 +17,13 @@ class MethodList:
     TL_PI=3
     TL_PID=4
 
+class TuningStatus:
+    COARSE_RELAY=0
+    COARSE_READY=1
+    COARSE_SETTLING=2
+    DWELL=3
+    FINE_RELAY=4
+    FINE_READY=5
 
 class PID:
     def __init__(self,Kp,Ki,Kd, out_min=-999999,out_max=999999):
@@ -44,24 +54,26 @@ class PID:
 
     def integral(self,error,t):
         if self.Ki!=0:
-            self.Imax=(self.outmax-self.P-self.D)/self.Ki
-            self.Imin=(self.outmin-self.P-self.D)/self.Ki
+            self.Imax=(self.outmax-self.P-self.D)
+            self.Imin=(self.outmin-self.P-self.D)
             change=self.Ki*error*(t-self.t_prev)
             self.I=self.I+change
 
             if error>0:
-                if self.Imax>0:
-                    if (self.I>self.Imax):
-                        self.I=self.Imax
-                else:
-                    self.I-=change
+                if self.I>0:
+                    if self.Imax>0:
+                        if (self.I>self.Imax):
+                            self.I=self.Imax
+                    else:
+                        self.I-=change
 
             else:
-                if self.Imin<0:
-                    if (self.I<self.Imin):
-                        self.I=self.Imin
-                else:
-                    self.I -= change
+                if self.I<0:
+                    if self.Imin<0:
+                        if (self.I<self.Imin):
+                            self.I=self.Imin
+                    else:
+                        self.I -= change
         else:
             self.I=0
 
@@ -147,7 +159,7 @@ class PID:
             return 0
 
 class PIDAutotuneRT:
-    def __init__(self, Y0,a,method=MethodList.TL_PI,cycles=5):
+    def __init__(self, Y0,a,a_fine,method=MethodList.TL_PI,cycles=5):
         """
         Autotuner based on relay feedback method
         Parameters
@@ -170,7 +182,16 @@ class PIDAutotuneRT:
         self.zerocrossingindices=np.array([])
         self.setpoint=Y0
         self.OPamp=a
+        self.OPlow=0
+        self.OPfine=a_fine
         self.method=method
+        self.status=TuningStatus.COARSE_RELAY
+        self.captureTime=0
+        self.postTime=0
+
+        #start scheduler thread
+
+
 
     def nextVal(self,currentPV,currentOP):
         if self.currentTime==0:
@@ -178,24 +199,67 @@ class PIDAutotuneRT:
         else:
             self.sampling=time.time()-self.currentTime
             self.currentTime=time.time()
-            self.PV=np.append(self.PV,currentPV)
-            self.Err=np.append(self.Err,self.setpoint-currentPV)
-            zerocrossings=self._zeroCrossings()
-            print(zerocrossings)
-            if zerocrossings>self.zerocrosses:
-                self._toggleOutput()
-                self.zerocrosses+=1
-                if self.zerocrosses>2*self.cycles:
-                    self.ready=True
-            self.OP=np.append(self.OP,self.currentOutput)
+            if self.status==TuningStatus.COARSE_RELAY or self.status==TuningStatus.FINE_RELAY:
+                # if (time.time()-self.postTime)>ATSETTLINGTIME and self.postTime!=0:
+                #
+                self.PV=np.append(self.PV,currentPV)
+                self.Err=np.append(self.Err,self.setpoint-currentPV)
+                zerocrossings=self._zeroCrossings()
+                print(zerocrossings)
+                if zerocrossings>self.zerocrosses:
+                    self._toggleOutput()
+                    self.zerocrosses+=1
+                    if self.zerocrosses > 2 * self.cycles:
+                        self.status = TuningStatus.COARSE_READY if self.status==TuningStatus.COARSE_RELAY else TuningStatus.FINE_READY
+                self.OP=np.append(self.OP,self.currentOutput)
 
-        return self.currentOutput
+            elif self.status==TuningStatus.COARSE_READY:
+                self.status=TuningStatus.COARSE_SETTLING
+                #reset PV and Err arrays
+                self.PV=np.array([])
+                self.Err=np.array([])
+                self.OP=np.array([])
+                self.zerocrossingindices = np.array([])
+                self.zerocrosses = 0
+                self.captureTime=time.time()
+
+            elif self.status==TuningStatus.DWELL:
+                if time.time()-self.postTime>ATSETTLINGTIME and self.postTime!=0:
+                    self.currentOutput = self.OPlow + self.OPamp
+                    self.status=TuningStatus.FINE_RELAY
+
+
+            elif self.status==TuningStatus.COARSE_SETTLING:
+                Err=self.setpoint-currentPV
+                delta=time.time()-self.captureTime
+                if (Err<0.01*self.setpoint and Err>-0.01*self.setpoint):
+                    pass
+                else:
+                    self.captureTime=time.time()
+
+                if delta>ATSETTLINGTIME:
+                    self.OPlow=currentOP-self.OPfine/2
+                    self.OPamp=self.OPfine
+                    self.currentOutput=self.OPlow
+                    self.postTime=time.time()
+                    self.status=TuningStatus.DWELL
+
+
+
+                print(delta)
+
+
+
+
+
+
+        return self.currentOutput,self.status
 
     def outputReady(self):
         return self.ready
 
     def PIDparameters(self):
-        if self.ready:
+        if self.status==TuningStatus.COARSE_READY or self.status==TuningStatus.FINE_READY:
             b,Tu=self._calculateInputs()
             print(b)
             print(Tu)
@@ -225,10 +289,10 @@ class PIDAutotuneRT:
             return {'Kc':0,'Ti':9999,'Td':0}
 
     def _toggleOutput(self):
-        if self.currentOutput==0:
-            self.currentOutput=self.OPamp
+        if self.currentOutput==self.OPlow:
+            self.currentOutput=self.OPamp+self.OPlow
         else:
-            self.currentOutput=0
+            self.currentOutput=self.OPlow
 
 
     def _zeroCrossings(self):
