@@ -15,7 +15,7 @@ from .CustomWidgets.mplwidget import MplWidget
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1230, 890)
+        MainWindow.resize(1238, 907)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("../../../../TemperatureLogger/img/temperature.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -522,7 +522,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.frame_4)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1230, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1238, 22))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -551,6 +551,7 @@ class Ui_MainWindow(object):
         self.AutotuneEnable.clicked.connect(MainWindow.eventHandler)
         self.Maxout.valueChanged['double'].connect(MainWindow.eventHandler)
         self.Minout.valueChanged['double'].connect(MainWindow.eventHandler)
+        self.AutotuneMethod.currentIndexChanged['int'].connect(MainWindow.eventHandler)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):

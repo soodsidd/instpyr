@@ -7,8 +7,9 @@ import time
 from dataclasses import dataclass
 
 
-ATSETTLINGTIME=10
-ZEROCROSSINGTOL=0.01
+ATSETTLINGTIME=100
+ZEROCROSSINGTOL=0.001
+METHODFACTORS=[[0.5,0,0],[1/2.2,1/1.2,0],[1/1.7,1/2,1/8],[1/3.2,2.2,0],[1/2.2,2.2,6.3]]
 
 @dataclass
 class MethodList:
@@ -266,26 +267,43 @@ class PIDAutotuneRT:
             Td=0
             Ti=9999
             Kc=0
-            if self.method==0:
-                Kc=Ku/2
-            elif self.method==1:
-                Kc=Ku/2.2
-                Ti=Tu/1.2
-            elif self.method==2:
-                Kc=Ku/1.7
-                Ti=Tu/2
-                Td=Tu/8
-            elif self.method==3:
-                Kc=Ku/3.2
-                Ti=2.2*Tu
-            elif self.method==4:
-                Kc=Ku/2.2
-                Ti=2.2*Tu
-                Td=Tu/6.3
+            Kc=METHODFACTORS[self.method][0]*Ku
+            Ti=METHODFACTORS[self.method][1]*Tu
+            Td=METHODFACTORS[self.method][2]*Tu
+            # if self.method==0:
+            #     Kc=Ku/2
+            # elif self.method==1:
+            #     Kc=Ku/2.2
+            #     Ti=Tu/1.2
+            # elif self.method==2:
+            #     Kc=Ku/1.7
+            #     Ti=Tu/2
+            #     Td=Tu/8
+            # elif self.method==3:
+            #     Kc=Ku/3.2
+            #     Ti=2.2*Tu
+            # elif self.method==4:
+            #     Kc=Ku/2.2
+            #     Ti=2.2*Tu
+            #     Td=Tu/6.3
 
             return {'Kc': Kc, 'Ti':Ti,'Td':Td}
         else:
             return {'Kc':0,'Ti':9999,'Td':0}
+
+    @classmethod
+    def convertPID(cls,Kp,Ti,Td,initialMethod:MethodList.ZN_PI,finalMethod:MethodList.TL_PI):
+        Kpn=Kp*METHODFACTORS[finalMethod][0]/(METHODFACTORS[initialMethod][0])
+        if (METHODFACTORS[initialMethod][1]) !=0:
+            Tin = Ti * METHODFACTORS[finalMethod][1] / (METHODFACTORS[initialMethod][1])
+        else:
+            Tin=0
+        if (METHODFACTORS[initialMethod][2]) !=0:
+            Tdn = Td * METHODFACTORS[finalMethod][2] / (METHODFACTORS[initialMethod][2])
+        else:
+            Tdn=0
+
+        return {'Kp':Kpn,'Ti':Tin,'Td':Tdn}
 
     def _toggleOutput(self):
         if self.currentOutput==self.OPlow:

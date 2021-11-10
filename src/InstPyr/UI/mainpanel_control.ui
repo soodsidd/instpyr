@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1230</width>
-    <height>890</height>
+    <width>1238</width>
+    <height>907</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -946,7 +946,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1230</width>
+     <width>1238</width>
      <height>22</height>
     </rect>
    </property>
@@ -982,7 +982,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>182</x>
-     <y>619</y>
+     <y>651</y>
     </hint>
     <hint type="destinationlabel">
      <x>232</x>
@@ -998,7 +998,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>183</x>
-     <y>785</y>
+     <y>817</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
@@ -1014,7 +1014,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>184</x>
-     <y>650</y>
+     <y>682</y>
     </hint>
     <hint type="destinationlabel">
      <x>156</x>
@@ -1045,7 +1045,7 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1044</x>
+     <x>1051</x>
      <y>166</y>
     </hint>
     <hint type="destinationlabel">
@@ -1126,7 +1126,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>173</x>
-     <y>294</y>
+     <y>293</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -1142,7 +1142,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>173</x>
-     <y>321</y>
+     <y>320</y>
     </hint>
     <hint type="destinationlabel">
      <x>169</x>
@@ -1158,7 +1158,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>174</x>
-     <y>352</y>
+     <y>351</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -1205,8 +1205,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>139</x>
-     <y>532</y>
+     <x>174</x>
+     <y>571</y>
     </hint>
     <hint type="destinationlabel">
      <x>218</x>
@@ -1243,6 +1243,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>208</x>
      <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AutotuneMethod</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>148</x>
+     <y>536</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>207</x>
+     <y>536</y>
     </hint>
    </hints>
   </connection>

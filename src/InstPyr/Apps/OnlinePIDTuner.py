@@ -84,6 +84,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
         self.minout=self.Minout.value()
         self.maxout=self.Maxout.value()
         self.ATstatus=None
+        self.ATmethod=PID.MethodList.TL_PI
 
         #sensors
         self.sensors['output_k']=watch.watch('Motor output',nameof(self.motoroutput),callfunc=self.variableProbe)
@@ -322,10 +323,24 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
                 self.squaregen.setText('Generate')
                 self.osc_setpoint=False
 
+        if name=='AutotuneMethod':
+            kp=self.Kp.value()
+            Ti=self.Ti.value()
+            Td=self.Td.value()
+            newmethod=self.AutotuneMethod.currentIndex()
+            params=PID.PIDAutotuneRT.convertPID(kp,Ti,Td,self.ATmethod,newmethod)
+            self.ATmethod=newmethod
+            self.Kp.setValue(params['Kp'])
+            self.Ti.setValue(params['Ti'])
+            self.Td.setValue(params['Td'])
+            self.pidcontroller.Kp=params['Kp']
+            self.pidcontroller.Ti=params['Ti']
+            self.pidcontroller.Td=params['Td']
+
         if name=='AutotuneEnable':
             if self.AutotuneEnable.isChecked():
                 self.PIDAutotuner=PID.PIDAutotuneRT(self.autotuneSetpoint.value(),self.autotuneControlAmp.value(),self.autotuneControlFineAmp.value(), cycles=self.autotuneCycles.value(),method=self.AutotuneMethod.currentIndex())
-
+                self.ATmethod=self.AutotuneMethod.currentIndex()
                 self.AutotuneEnable.setText('Autotuning')
                 self.ATstatus=PID.TuningStatus.COARSE_RELAY
                 self.autoTuneUI_update(True)
@@ -380,6 +395,7 @@ class MainWindow(QMainWindow,mainpanel_control.Ui_MainWindow):
             self.autotuneControlFineAmp.setDisabled(disable)
             self.autotuneCycles.setDisabled(disable)
             self.Setpoint.setDisabled(disable)
+            self.AutotuneMethod.setDisabled(disable)
 
 
 
