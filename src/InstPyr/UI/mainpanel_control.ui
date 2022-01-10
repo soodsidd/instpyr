@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1238</width>
-    <height>907</height>
+    <width>1329</width>
+    <height>921</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -400,6 +400,86 @@
                 <bool>true</bool>
                </property>
               </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="font">
+             <font>
+              <pointsize>10</pointsize>
+             </font>
+            </property>
+            <property name="title">
+             <string>Manual Control</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_12">
+             <item>
+              <widget class="QPushButton" name="DisablePID">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>50</weight>
+                 <bold>false</bold>
+                </font>
+               </property>
+               <property name="text">
+                <string>Disable PID</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <item>
+                <widget class="QLabel" name="label_20">
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Power</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="ManualPower">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>53</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>8</pointsize>
+                  </font>
+                 </property>
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>-1.000000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
@@ -946,8 +1026,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1238</width>
-     <height>22</height>
+     <width>1329</width>
+     <height>21</height>
     </rect>
    </property>
   </widget>
@@ -981,8 +1061,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>651</y>
+     <x>181</x>
+     <y>662</y>
     </hint>
     <hint type="destinationlabel">
      <x>232</x>
@@ -997,8 +1077,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>817</y>
+     <x>182</x>
+     <y>854</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
@@ -1013,8 +1093,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>184</x>
-     <y>682</y>
+     <x>183</x>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
      <x>156</x>
@@ -1029,8 +1109,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1050</x>
-     <y>815</y>
+     <x>1134</x>
+     <y>868</y>
     </hint>
     <hint type="destinationlabel">
      <x>1066</x>
@@ -1045,8 +1125,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1051</x>
-     <y>166</y>
+     <x>1134</x>
+     <y>219</y>
     </hint>
     <hint type="destinationlabel">
      <x>1026</x>
@@ -1077,8 +1157,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>131</y>
+     <x>182</x>
+     <y>132</y>
     </hint>
     <hint type="destinationlabel">
      <x>285</x>
@@ -1093,8 +1173,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>158</y>
+     <x>182</x>
+     <y>160</y>
     </hint>
     <hint type="destinationlabel">
      <x>345</x>
@@ -1109,8 +1189,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>185</y>
+     <x>182</x>
+     <y>188</y>
     </hint>
     <hint type="destinationlabel">
      <x>487</x>
@@ -1125,8 +1205,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>293</y>
+     <x>172</x>
+     <y>298</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -1141,8 +1221,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>320</y>
+     <x>172</x>
+     <y>326</y>
     </hint>
     <hint type="destinationlabel">
      <x>169</x>
@@ -1157,8 +1237,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>174</x>
-     <y>351</y>
+     <x>173</x>
+     <y>357</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -1189,8 +1269,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>559</x>
-     <y>83</y>
+     <x>563</x>
+     <y>78</y>
     </hint>
     <hint type="destinationlabel">
      <x>221</x>
@@ -1205,8 +1285,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>174</x>
-     <y>571</y>
+     <x>173</x>
+     <y>581</y>
     </hint>
     <hint type="destinationlabel">
      <x>218</x>
@@ -1247,18 +1327,34 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>AutotuneMethod</sender>
-   <signal>currentIndexChanged(int)</signal>
+   <sender>DisablePID</sender>
+   <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>148</x>
-     <y>536</y>
+     <x>123</x>
+     <y>406</y>
     </hint>
     <hint type="destinationlabel">
-     <x>207</x>
-     <y>536</y>
+     <x>209</x>
+     <y>411</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ManualPower</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>eventHandler()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>139</x>
+     <y>441</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>206</x>
+     <y>401</y>
     </hint>
    </hints>
   </connection>
