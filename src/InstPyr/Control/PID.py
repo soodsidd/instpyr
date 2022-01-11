@@ -161,7 +161,7 @@ class PID:
             return 0
 
 class PIDAutotuneRT:
-    def __init__(self, Y0,a,a_fine,method=MethodList.TL_PI,cycles=5):
+    def __init__(self, Y0,a,a_fine,method=MethodList.TL_PI,cycles=5,midpoint=0):
         """
         Autotuner based on relay feedback method
         Parameters
@@ -184,7 +184,7 @@ class PIDAutotuneRT:
         self.zerocrossingindices=np.array([])
         self.setpoint=Y0
         self.OPamp=a
-        self.OPlow=0
+        self.OPlow=midpoint-self.OPamp/2
         self.OPfine=a_fine
         self.method=method
         self.status=TuningStatus.COARSE_RELAY
