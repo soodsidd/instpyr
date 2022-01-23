@@ -25,8 +25,15 @@ class MyPlotter:
         self.ylims=[0,0]
         self.datetimeaxis=datetimeaxis
 
-        #connect plotwidget autoscale to autoscale flag:
+        #connect plotwidget signals - these are signals from UI interactions with this widget
         self.plotwidget.auto_scale.connect(self._toolbaractive)
+        self.plotwidget.xvariable_sig.connect(self._xchanged)
+        self.plotwidget.yvarsLeft_sig.connect(self._yvarsLeft)
+        self.plotwidget.yvarsRight_sig.connect(self._yvarsRight)
+        self.plotwidget.zoomsig.connect(self._horZoomChanged)
+
+
+
         self.plotwidget.canvas.ax.margins(x=0)
 
 
@@ -88,6 +95,18 @@ class MyPlotter:
         # print('Triggered'+str(active))
         self.autoscale=True if active==0 else False
         # print(self.autoscale)
+
+    def _xchanged(self,params):
+        print(params)
+
+    def _yvarsLeft(self,params):
+        print(params)
+
+    def _yvarsRight(self,params):
+        print(params)
+
+    def _horZoomChanged(self,params):
+        print(params)
 
     @property
     def legend(self):
@@ -296,7 +315,7 @@ class _PlotTester(QMainWindow):
         # self.myplot3=MyPlotter(self.w, 100)
         self.setCentralWidget(self.w)
         self.timer=QtCore.QTimer()
-        self.timer.setInterval(100)
+        self.timer.setInterval(500)
         self.timer.timeout.connect(self.updateTestPlot)
         self.timer.start()
 
