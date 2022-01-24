@@ -1,5 +1,11 @@
 import collections
 
+class triangle:
+    pass
+
+class sinusoid:
+    pass
+
 class square:
     def __init__(self,sample:float,period:float,maxval=1,minval=0,duty=0.5 ):
         #initialize waveform here

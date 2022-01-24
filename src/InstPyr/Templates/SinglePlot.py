@@ -41,16 +41,10 @@ class Worker(QRunnable):
 
 class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
     def __init__(self):
+        #************STATIC CODE************
         super(self.__class__,self).__init__()
-        self.setupUi(self)
-        self.ControlBay.hide()
-        #Setup variables
-        self.watchlist=[]
-        self.logger = None
-        self.samplingrate = int(1000/self.Sampling.value())
-        self.logfilename = ''
-        self.logenable = False
-        self.currentTime=0
+        self._appsetup()
+
 
         #************YOUR CODE GOES HERE************
 
@@ -86,40 +80,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.watchlist.append(watch('Lid Temperature (C)', nameof(self.lidTemp),callfunc=self.variableProbe))
 
 
-
         #************STATIC CODE************
-        #setup widgets
-        self.plot=Plotter(self.Mainplot,variables=self.watchlist)
-        #setup threads
-        self.threadpool=QThreadPool()
-        self.dispQueue=Queue()
-        dispWorker=Worker(self.update_display)
-        self.threadpool.start(dispWorker)
-
-        self.logQueue = Queue()
-        logWorker = Worker(self.logdata)
-        self.threadpool.start(logWorker)
-
-        self.eventQueue=Queue()
-
-        #Define mainloop timer
-        self.timer=QtCore.QTimer()
-        self.timer.setInterval(self.samplingrate)
-        self.timer.timeout.connect(self.mainloop)
-        self.timer.start()
-        self.logQueue.join()
-        self.dispQueue.join()
-
-        #Redefine UI
-        if len(self.ControlBay.findChildren(QtWidgets.QWidget)) is not 0:
-            self.ControlBay.show()
-
-        #Reformat watchlist:
-        temp={}
-        for item in self.watchlist:
-            name=item.variableName
-            temp[name]=item
-        self.watchlist=temp
+        self._postInit()
 
 
 
@@ -161,6 +123,50 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
 
     # ************STATIC CODE************
+    def _appsetup(self):
+        self.setupUi(self)
+        self.ControlBay.hide()
+        #Setup variables
+        self.watchlist=[]
+        self.logger = None
+        self.samplingrate = int(1000/self.Sampling.value())
+        self.logfilename = ''
+        self.logenable = False
+        self.currentTime=0
+    def _postInit(self):
+        # ************STATIC CODE************
+        # setup widgets
+        self.plot = Plotter(self.Mainplot, variables=self.watchlist)
+        # setup threads
+        self.threadpool = QThreadPool()
+        self.dispQueue = Queue()
+        dispWorker = Worker(self.update_display)
+        self.threadpool.start(dispWorker)
+
+        self.logQueue = Queue()
+        logWorker = Worker(self.logdata)
+        self.threadpool.start(logWorker)
+
+        self.eventQueue = Queue()
+
+        # Define mainloop timer
+        self.timer = QtCore.QTimer()
+        self.timer.setInterval(self.samplingrate)
+        self.timer.timeout.connect(self.mainloop)
+        self.timer.start()
+        self.logQueue.join()
+        self.dispQueue.join()
+
+        # Redefine UI
+        if len(self.ControlBay.findChildren(QtWidgets.QWidget)) is not 0:
+            self.ControlBay.show()
+
+        # Reformat watchlist:
+        temp = {}
+        for item in self.watchlist:
+            name = item.variableName
+            temp[name] = item
+        self.watchlist = temp
     def loadqueues(self):
         vardata = {}
         for watch in self.watchlist.values():
