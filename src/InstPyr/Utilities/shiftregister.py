@@ -16,6 +16,10 @@ class shiftregister:
         self.buffer.insert(0,0)
         return a
 
+    def showlast(self,number):
+        #show last N entries
+        return list(self.buffer)[self.size-number:self.size]
+
     def data(self):
         return list(self.buffer)
 
@@ -32,6 +36,8 @@ class shiftregister:
 
     def __str__(self):
         return str(list(self.buffer))
+
+
 
 if __name__=="__main__":
     a=shiftregister(10)

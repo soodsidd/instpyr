@@ -1,5 +1,7 @@
 import scipy.signal as signal
 import numpy as np
+from ..Utilities.shiftregister import shiftregister
+import time
 class MyFilter:
     def __init__(self):
         self.lowpassfilt=None
@@ -32,6 +34,44 @@ class MyFilter:
 
     # @classmethod
     # # def rampfilter(cls,data,rate):
+
+class RateLimiter(MyFilter):
+    def __init__(self,ratelimit):
+        super().__init__()
+        self.output=0
+        self.rate=ratelimit
+        self.maxrate=ratelimit
+        self.currentTime=time.time()
+        self.registersize=10
+        self.buffer=shiftregister(self.registersize)
+
+    def nextVal(self,data):
+        self.buffer.push(data)
+        self.newtime=time.time()
+        elapsedtime=self.newtime-self.currentTime
+        #read last two values:
+        list=self.buffer.showlast(2)
+        if elapsedtime!=0:
+            rate=(list[1]-self.output)/elapsedtime
+        else:
+            rate=0
+
+        if abs(rate)<self.maxrate:
+            self.rate=rate
+        else:
+            self.rate=np.sign(rate)*self.maxrate
+
+        self.currentTime=self.newtime
+        self.output=self.output+self.rate*elapsedtime
+        return self.output
+
+
+
+
+    def reset(self):
+        self.output=0
+        self.buffer=shiftregister(self.registersize)
+
 
 
 

@@ -16,7 +16,7 @@ if curr=='Templates':
     from src.InstPyr.Logging import Logger
     from src.InstPyr.Utilities.watch import watch
     from src.InstPyr.Control.Plant import Plant
-    from src.InstPyr.Control.Filter import MyFilter
+    from src.InstPyr.Control.Filter import MyFilter,RateLimiter
     from src.InstPyr.Control.Waveform import *
     from src.InstPyr.Utilities.shiftregister import shiftregister
 else:
@@ -27,7 +27,7 @@ else:
     from InstPyr.Control.Plant import Plant
     from InstPyr.Utilities.watch import watch
     from InstPyr.Utilities.shiftregister import shiftregister
-    from InstPyr.Control.Filter import MyFilter
+    from InstPyr.Control.Filter import MyFilter,RateLimiter
     from InstPyr.Control.Waveform import *
 
 
@@ -65,13 +65,14 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.scalefactor=1
         self.targetinst=''
         self.realTempRegister=shiftregister(size=10)
+        self.rampfilter=RateLimiter(1)
 
 
         #Define Controls,Define callback functions past 'MainLoop'
         self.addNumeric('Setpoint',self.setpointchange,-1,1,0.1)
         self.addButton('Push Me',self.buttonpush,latching=True)
         subcon=self.addGroup('Sub Controls')
-        self.addNumeric('Average Points',self.filterchange,1,1000,1,50,parent=subcon)
+        self.addNumeric('RampRate',self.filterchange,1,1000,1,50,parent=subcon)
         self.addDropdown('Instrument List',['2001dn','2002dn'],self.dropdownchanged,parent=subcon)
         self.addButton('Connect',self.instconnect, parent=subcon)
 
@@ -98,7 +99,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.realTempRegister.push(self.realTemp)
         self.procTemp=self.interface.readTemperature(0)/1000000
         self.lidTemp=self.interface.readTemperature(0)
-        self.realTemp_filtered=MyFilter.movingaverage(self.realTempRegister.data())
+        self.realTemp_filtered=self.rampfilter.nextVal(self.realTemp)
         self.processoutput=self.simsystem.realTime(self.realTemp,self.currentTime)
 
 
@@ -118,8 +119,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
     def filterchange(self,val):
         print('here' + str(val))
-        self.realTempRegister.size=val
-        # self.watchlist['realTemp'].buffersize=val
+        self.rampfilter.maxrate=val
 
     def instconnect(self,val):
         print(val)
