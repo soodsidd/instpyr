@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1329</width>
-    <height>921</height>
+    <width>1321</width>
+    <height>962</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1026,8 +1026,8 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1329</width>
-     <height>21</height>
+     <width>1321</width>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -1061,8 +1061,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>181</x>
-     <y>662</y>
+     <x>182</x>
+     <y>724</y>
     </hint>
     <hint type="destinationlabel">
      <x>232</x>
@@ -1077,8 +1077,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>854</y>
+     <x>183</x>
+     <y>890</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
@@ -1093,8 +1093,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>183</x>
-     <y>693</y>
+     <x>184</x>
+     <y>755</y>
     </hint>
     <hint type="destinationlabel">
      <x>156</x>
@@ -1109,7 +1109,7 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1134</x>
+     <x>1127</x>
      <y>868</y>
     </hint>
     <hint type="destinationlabel">
@@ -1125,7 +1125,7 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1134</x>
+     <x>1127</x>
      <y>219</y>
     </hint>
     <hint type="destinationlabel">
@@ -1157,8 +1157,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>132</y>
+     <x>183</x>
+     <y>131</y>
     </hint>
     <hint type="destinationlabel">
      <x>285</x>
@@ -1173,8 +1173,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>160</y>
+     <x>183</x>
+     <y>158</y>
     </hint>
     <hint type="destinationlabel">
      <x>345</x>
@@ -1189,8 +1189,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>182</x>
-     <y>188</y>
+     <x>183</x>
+     <y>185</y>
     </hint>
     <hint type="destinationlabel">
      <x>487</x>
@@ -1205,8 +1205,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>298</y>
+     <x>173</x>
+     <y>292</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -1221,8 +1221,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>172</x>
-     <y>326</y>
+     <x>173</x>
+     <y>319</y>
     </hint>
     <hint type="destinationlabel">
      <x>169</x>
@@ -1237,8 +1237,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>357</y>
+     <x>174</x>
+     <y>350</y>
     </hint>
     <hint type="destinationlabel">
      <x>168</x>
@@ -1269,7 +1269,7 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>563</x>
+     <x>558</x>
      <y>78</y>
     </hint>
     <hint type="destinationlabel">
@@ -1285,8 +1285,8 @@ p, li { white-space: pre-wrap; }
    <slot>eventHandler()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>173</x>
-     <y>581</y>
+     <x>174</x>
+     <y>645</y>
     </hint>
     <hint type="destinationlabel">
      <x>218</x>

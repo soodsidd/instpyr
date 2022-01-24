@@ -7,7 +7,7 @@ import time
 import numpy as np
 # from cycler import cycler
 import numpy as np
-from src.InstPyr.Utilities.watch import watch
+from ..Utilities.watch import watch
 from varname import nameof
 linestyle_str = [
      ('solid', 'solid'),      # Same as (0, ()) or '-'
