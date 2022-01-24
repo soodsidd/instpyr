@@ -23,12 +23,15 @@ class MyFilter:
         return yout
 
     @classmethod
-    def movingaverage(cls,data,pts=0):
-        if pts==0:
+    def movingaverage(cls,data,N=0):
+        #sampling rate in seconds
+        if N==0 or N>len(data):
             return np.average(data)
         else:
-            return np.average(data[len(data)-pts:len(data)-1])
+            return np.average(data[len(data)-N:len(data)-1])
 
+    # @classmethod
+    # # def rampfilter(cls,data,rate):
 
 
 

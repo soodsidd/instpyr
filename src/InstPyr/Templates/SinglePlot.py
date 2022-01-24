@@ -17,6 +17,8 @@ if curr=='Templates':
     from src.InstPyr.Utilities.watch import watch
     from src.InstPyr.Control.Plant import Plant
     from src.InstPyr.Control.Filter import MyFilter
+    from src.InstPyr.Control.Waveform import *
+    from src.InstPyr.Utilities.shiftregister import shiftregister
 else:
     from InstPyr.UI import SinglePlotUI
     import InstPyr.Interfaces.simulator as simulator
@@ -24,7 +26,9 @@ else:
     from InstPyr.Logging import Logger
     from InstPyr.Control.Plant import Plant
     from InstPyr.Utilities.watch import watch
+    from InstPyr.Utilities.shiftregister import shiftregister
     from InstPyr.Control.Filter import MyFilter
+    from InstPyr.Control.Waveform import *
 
 
 from varname import nameof
@@ -60,6 +64,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.realTemp_filtered=0
         self.scalefactor=1
         self.targetinst=''
+        self.realTempRegister=shiftregister(size=10)
 
 
         #Define Controls,Define callback functions past 'MainLoop'
@@ -90,9 +95,10 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         #************YOUR CODE GOES HERE************
         self.currentTime+=self.samplingrate/1000
         self.realTemp=self.scalefactor*self.interface.readTemperature(0)
+        self.realTempRegister.push(self.realTemp)
         self.procTemp=self.interface.readTemperature(0)/1000000
         self.lidTemp=self.interface.readTemperature(0)
-        self.realTemp_filtered=np.mean(list(self.watchlist['realTemp'].buffer))
+        self.realTemp_filtered=MyFilter.movingaverage(self.realTempRegister.data())
         self.processoutput=self.simsystem.realTime(self.realTemp,self.currentTime)
 
 
@@ -103,6 +109,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
     # ************YOUR CODE GOES HERE************
     #Define callback functions for custom controls here
     def buttonpush(self,val):
+        print(self.sender())
         print('here'+str(val))
 
     def setpointchange(self,val):
@@ -111,7 +118,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
     def filterchange(self,val):
         print('here' + str(val))
-        self.watchlist['realTemp'].buffersize=val
+        self.realTempRegister.size=val
+        # self.watchlist['realTemp'].buffersize=val
 
     def instconnect(self,val):
         print(val)
@@ -281,9 +289,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
             self.verticalLayout_6.addLayout(hbox)
         else:
             parent.addLayout(hbox)
+        doubleEdit.setKeyboardTracking(False)
         doubleEdit.valueChanged['double'].connect(callback)
-
-        pass
     def addGroup(self,name,parent=None):
         gbox=QtWidgets.QGroupBox(name)
         glayout=QtWidgets.QVBoxLayout(gbox)
