@@ -26,10 +26,15 @@ class MplCanvas(Canvas):
 # Matplotlib widget
 class MplWidget(QtWidgets.QWidget):
     auto_scale=pyqtSignal(int,name='auto_scale')
+    xvariable_sig=pyqtSignal(list,name='xvariable')
+    yvarsLeft_sig=pyqtSignal(list,name='yvarsleft')
+    yvarsRight_sig=pyqtSignal(list,name='yvarsRight')
+    zoomsig=pyqtSignal(int,name='ZoomSignal')
     def __init__(self, parent=None):
         QtWidgets.QWidget.__init__(self, parent)   # Inherit from QWidget
         self.canvas = MplCanvas()
-        self.yvars=[]
+        self.yvarsL=[]
+        self.yvarsR=[]
 
         #Add widgets here:
         self.toolbar=myNavToolbar(self.canvas,self)
@@ -50,10 +55,13 @@ class MplWidget(QtWidgets.QWidget):
         #Initialize Widgets here:
         self.showVars.setChecked(False)
         self.variableselector.hide()
-        self._populateYvars(['P gain','Control signal','D gain','G gain','Error','Temperature','Pressure'])
+        # self._populateYvars(['P gain','Control signal','D gain','G gain','Error','Temperature','Pressure'])
         #Connect signals
         self.showVars.clicked.connect(self._showvarbar)
         self.toolbar.autoscale.connect(self.toolbar_active)
+        self.Xchoices.currentIndexChanged.connect(self._xvarChanged)
+        self.timezoom.sliderMoved['int'].connect(self._zoomChanged)
+
 
         #Setup Layout
         self._setupLayout()
@@ -126,11 +134,11 @@ class MplWidget(QtWidgets.QWidget):
         #pass the signal onto the plotter class
         self.auto_scale.emit(active)
 
-    def _populateYvars(self,names):
+    def populateVariables(self,names):
         header=QtWidgets.QHBoxLayout()
-        left=QtWidgets.QLabel('Left')
-        center=QtWidgets.QLabel('Variables')
-        right=QtWidgets.QLabel('Right')
+        left=QtWidgets.QLabel('L')
+        center=QtWidgets.QLabel('Vars')
+        right=QtWidgets.QLabel('R')
         font = QtGui.QFont()
         font.setPointSize(10)
         # font.setBold(True)
@@ -143,6 +151,10 @@ class MplWidget(QtWidgets.QWidget):
         header.addStretch(1)
         header.addWidget(right)
         self.variableselectorlayout.addLayout(header)
+        line = QtWidgets.QFrame()
+        line.setFrameShape(QtWidgets.QFrame.HLine)
+        line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.variableselectorlayout.addWidget(line)
         if isinstance(names, list):
             for elem in names:
                 self._addYvar(elem)
@@ -151,9 +163,19 @@ class MplWidget(QtWidgets.QWidget):
 
     def _addYvar(self,name):
         # index=len(self.yvars)
+        index=len(self.yvarsL)
         rowhbox=QtWidgets.QHBoxLayout()
         cboxL=QtWidgets.QCheckBox()
+        cboxL.setObjectName(str(index))
+        cboxL.setChecked(True)
         cboxR=QtWidgets.QCheckBox()
+        cboxR.setObjectName(str(index))
+        cboxR.setChecked(False)
+
+        cboxL.clicked['bool'].connect(self._yvarLChecked)
+        cboxR.clicked['bool'].connect(self._yvarRChecked)
+
+
 
         label=QtWidgets.QLabel(name)
         font=QtGui.QFont()
@@ -166,8 +188,45 @@ class MplWidget(QtWidgets.QWidget):
         rowhbox.addWidget(cboxR)
         self.variableselectorlayout.addLayout(rowhbox)
         self.Xchoices.addItem(name)
-        self.yvars.append([cboxL,name,cboxR])
+        self.yvarsL.append(cboxL)
+        self.yvarsR.append(cboxR)
 
+    def _yvarLChecked(self,state,*args):
+        index=int(self.sender().objectName())
+        if state is True:
+            self.yvarsR[index].setChecked(False)
+            # self.yvarsRight_sig.emit([index,False])
+
+        self.yvarsLeft_sig.emit([index,state])
+        print(state)
+        print('here')
+
+    def _yvarRChecked(self,state,*args):
+        index = int(self.sender().objectName())
+        if state is True:
+            self.yvarsL[index].setChecked(False)
+            # self.yvarsLeft_sig.emit([index, False])
+
+        self.yvarsRight_sig.emit([index,state])
+
+        print(state)
+        print('here')
+
+    def _xvarChanged(self,index,*args):
+        print(self.sender().objectName())
+        text=self.Xchoices.currentText()
+        self.xvariable_sig.emit([index,text])
+        # print('here'+str(index))
+
+    def _zoomChanged(self,scale):
+        self.zoomsig.emit(scale)
+
+    def reapplyformatting(self):
+        # self.canvas.ax.minorticks_on()
+        self.canvas.ax.grid(b=True, which='major', color='silver', linestyle='-')
+        # self.canvas.ax.grid(b=True, which='minor', color='gainsboro', linestyle='--')
+        self.canvas.fig.tight_layout()
+        self.canvas.fig.set_tight_layout(True)
 
 
 class myNavToolbar(NavigationToolbar):

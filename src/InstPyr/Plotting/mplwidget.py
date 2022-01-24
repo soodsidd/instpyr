@@ -26,7 +26,7 @@ class MplCanvas(Canvas):
 # Matplotlib widget
 class MplWidget(QtWidgets.QWidget):
     auto_scale=pyqtSignal(int,name='auto_scale')
-    xvariable_sig=pyqtSignal(int,name='xvariable')
+    xvariable_sig=pyqtSignal(list,name='xvariable')
     yvarsLeft_sig=pyqtSignal(list,name='yvarsleft')
     yvarsRight_sig=pyqtSignal(list,name='yvarsRight')
     zoomsig=pyqtSignal(int,name='ZoomSignal')
@@ -55,7 +55,7 @@ class MplWidget(QtWidgets.QWidget):
         #Initialize Widgets here:
         self.showVars.setChecked(False)
         self.variableselector.hide()
-        self._populateYvars(['P gain','Control signal','D gain','G gain','Error','Temperature','Pressure'])
+        # self._populateYvars(['P gain','Control signal','D gain','G gain','Error','Temperature','Pressure'])
         #Connect signals
         self.showVars.clicked.connect(self._showvarbar)
         self.toolbar.autoscale.connect(self.toolbar_active)
@@ -134,11 +134,11 @@ class MplWidget(QtWidgets.QWidget):
         #pass the signal onto the plotter class
         self.auto_scale.emit(active)
 
-    def _populateYvars(self,names):
+    def populateVariables(self,names):
         header=QtWidgets.QHBoxLayout()
-        left=QtWidgets.QLabel('Left')
-        center=QtWidgets.QLabel('Variables')
-        right=QtWidgets.QLabel('Right')
+        left=QtWidgets.QLabel('L')
+        center=QtWidgets.QLabel('Vars')
+        right=QtWidgets.QLabel('R')
         font = QtGui.QFont()
         font.setPointSize(10)
         # font.setBold(True)
@@ -167,8 +167,10 @@ class MplWidget(QtWidgets.QWidget):
         rowhbox=QtWidgets.QHBoxLayout()
         cboxL=QtWidgets.QCheckBox()
         cboxL.setObjectName(str(index))
+        cboxL.setChecked(True)
         cboxR=QtWidgets.QCheckBox()
         cboxR.setObjectName(str(index))
+        cboxR.setChecked(False)
 
         cboxL.clicked['bool'].connect(self._yvarLChecked)
         cboxR.clicked['bool'].connect(self._yvarRChecked)
@@ -193,7 +195,7 @@ class MplWidget(QtWidgets.QWidget):
         index=int(self.sender().objectName())
         if state is True:
             self.yvarsR[index].setChecked(False)
-            self.yvarsRight_sig.emit([index,False])
+            # self.yvarsRight_sig.emit([index,False])
 
         self.yvarsLeft_sig.emit([index,state])
         print(state)
@@ -203,7 +205,7 @@ class MplWidget(QtWidgets.QWidget):
         index = int(self.sender().objectName())
         if state is True:
             self.yvarsL[index].setChecked(False)
-            self.yvarsLeft_sig.emit([index, False])
+            # self.yvarsLeft_sig.emit([index, False])
 
         self.yvarsRight_sig.emit([index,state])
 
@@ -212,11 +214,20 @@ class MplWidget(QtWidgets.QWidget):
 
     def _xvarChanged(self,index,*args):
         print(self.sender().objectName())
-        self.xvariable_sig.emit(index)
+        text=self.Xchoices.currentText()
+        self.xvariable_sig.emit([index,text])
         # print('here'+str(index))
 
     def _zoomChanged(self,scale):
         self.zoomsig.emit(scale)
+
+    def reapplyformatting(self):
+        # self.canvas.ax.minorticks_on()
+        self.canvas.ax.grid(b=True, which='major', color='silver', linestyle='-')
+        # self.canvas.ax.grid(b=True, which='minor', color='gainsboro', linestyle='--')
+        self.canvas.fig.tight_layout()
+        self.canvas.fig.set_tight_layout(True)
+
 
 class myNavToolbar(NavigationToolbar):
     autoscale = pyqtSignal(int, name='disautoscale')

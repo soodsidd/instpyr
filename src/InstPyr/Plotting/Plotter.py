@@ -32,7 +32,7 @@ class MyPlotter:
         self.plotwidget.yvarsRight_sig.connect(self._yvarsRight)
         self.plotwidget.zoomsig.connect(self._horZoomChanged)
 
-
+        self.plotwidget.populateVariables(['P gain','Control signal','D gain','G gain','Error','Temperature','Pressure','Humidity'])
 
         self.plotwidget.canvas.ax.margins(x=0)
 
