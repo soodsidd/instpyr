@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets,QtGui
 from PyQt5.QtCore import *
 from PyQt5 import QtCore
 import sys
+import time
 from queue import Queue
 from datetime import datetime
 import os
@@ -72,7 +73,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.addNumeric('Setpoint',self.setpointchange,-1,1,0.1)
         self.addButton('Push Me',self.buttonpush,latching=True)
         subcon=self.addGroup('Sub Controls')
-        self.addNumeric('RampRate',self.filterchange,1,1000,1,50,parent=subcon)
+        self.addNumeric('RampRate (C/sec)',self.filterchange,1,1000,1,1,parent=subcon)
         self.addDropdown('Instrument List',['2001dn','2002dn'],self.dropdownchanged,parent=subcon)
         self.addButton('Connect',self.instconnect, parent=subcon)
 
@@ -94,7 +95,12 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
     def mainloop(self):
         #************YOUR CODE GOES HERE************
-        self.currentTime+=self.samplingrate/1000
+        #use this for accurate timekeeping
+        newtime=time.time()
+        elapsedtime=newtime-self.currentTime
+        self.currentTime=newtime
+
+
         self.realTemp=self.scalefactor*self.interface.readTemperature(0)
         self.realTempRegister.push(self.realTemp)
         self.procTemp=self.interface.readTemperature(0)/1000000
@@ -140,7 +146,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.samplingrate = int(1000/self.Sampling.value())
         self.logfilename = ''
         self.logenable = False
-        self.currentTime=0
+        self.currentTime=time.time()
     def _postInit(self):
         # ************STATIC CODE************
         # setup widgets
