@@ -24,6 +24,7 @@ else:
     from InstPyr.Logging import Logger
     from InstPyr.Control.Plant import Plant
     from InstPyr.Utilities.watch import watch
+    from InstPyr.Control.Filter import MyFilter
 
 
 from varname import nameof
@@ -148,7 +149,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
     def filterchange(self,val):
         print('here' + str(val))
-        self.watchlist[0].buffersize=val
+        self.watchlist['realTemp'].buffersize=val
 
     def instconnect(self,val):
         print(val)
