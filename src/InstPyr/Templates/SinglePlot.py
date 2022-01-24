@@ -15,12 +15,14 @@ if curr=='Templates':
     from src.InstPyr.Plotting.PlotterWatch import MyPlotterWatch as Plotter
     from src.InstPyr.Logging import Logger
     from src.InstPyr.Utilities.watch import watch
+    from src.InstPyr.Control.Plant import Plant
     from src.InstPyr.Control.Filter import MyFilter
 else:
     from InstPyr.UI import SinglePlotUI
     import InstPyr.Interfaces.simulator as simulator
     from InstPyr.Plotting.PlotterWatch import MyPlotterWatch as Plotter
     from InstPyr.Logging import Logger
+    from InstPyr.Control.Plant import Plant
     from InstPyr.Utilities.watch import watch
 
 
@@ -47,17 +49,19 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.samplingrate = int(1000/self.Sampling.value())
         self.logfilename = ''
         self.logenable = False
-
+        self.currentTime=0
 
         #************YOUR CODE GOES HERE************
 
         #setup interface and devices
         self.interface=simulator.simulator()
+        self.simsystem=Plant([1],[1,0.5,1])
 
         #setup variables
         self.realTemp = 0
         self.procTemp=0
         self.lidTemp=0
+        self.processoutput=0
         self.realTemp_filtered=0
         self.scalefactor=1
         self.targetinst=''
@@ -76,6 +80,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         #setup a 'watch' for every variable that you want to plot
         self.watchlist.append(watch('Real Temperature (C)',nameof(self.realTemp),callfunc=self.variableProbe))
         self.watchlist.append(watch('Real Temp(filt) (C)', nameof(self.realTemp_filtered),callfunc=self.variableProbe))
+        self.watchlist.append(watch('Process Output', nameof(self.processoutput),callfunc=self.variableProbe))
         self.watchlist.append(watch('Process Temperature (C)', nameof(self.procTemp),callfunc=self.variableProbe))
         self.watchlist.append(watch('Lid Temperature (C)', nameof(self.lidTemp),callfunc=self.variableProbe))
 
@@ -120,11 +125,12 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
     def mainloop(self):
         #************YOUR CODE GOES HERE************
+        self.currentTime+=self.samplingrate/1000
         self.realTemp=self.scalefactor*self.interface.readTemperature(0)
         self.procTemp=self.interface.readTemperature(0)/1000000
         self.lidTemp=self.interface.readTemperature(0)
         self.realTemp_filtered=np.mean(list(self.watchlist['realTemp'].buffer))
-
+        self.processoutput=self.simsystem.realTime(self.realTemp,self.currentTime)
 
 
 
