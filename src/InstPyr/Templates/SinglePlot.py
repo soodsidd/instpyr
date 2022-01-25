@@ -1,3 +1,5 @@
+import threading
+
 from PyQt5.QtWidgets import *
 from PyQt5 import QtWidgets,QtGui
 from PyQt5.QtCore import *
@@ -33,13 +35,14 @@ else:
 
 
 from varname import nameof
-
+#************STATIC CODE************
 class Worker(QRunnable):
     def __init__(self, fn, *args, **kwargs):
         super(Worker, self).__init__()
         self.fn = fn
         self.args = args
         self.kwargs = kwargs
+
     @pyqtSlot()
     def run(self):
         self.fn(*self.args, **self.kwargs)
@@ -52,7 +55,6 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
 
         #************YOUR CODE GOES HERE************
-
         #setup interface and devices
         self.interface=simulator.simulator()
         self.simsystem=Plant([1],[1,0.5,1])
@@ -78,7 +80,6 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.addButton('Connect',self.instconnect, parent=subcon)
 
 
-
         #setup a 'watch' for every variable that you want to plot
         self.watchlist.append(watch('Real Temperature (C)',nameof(self.realTemp),callfunc=self.variableProbe))
         self.watchlist.append(watch('Real Temp(filt) (C)', nameof(self.realTemp_filtered),callfunc=self.variableProbe))
@@ -91,8 +92,6 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self._postInit()
 
 
-
-
     def mainloop(self):
         #************YOUR CODE GOES HERE************
         #use this for accurate timekeeping
@@ -100,6 +99,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         elapsedtime=newtime-self.currentTime
         self.currentTime=newtime
 
+        #update statusbar here:
+        self.setStatus('Online')
 
         self.realTemp=self.scalefactor*self.interface.readTemperature(0)
         self.realTempRegister.push(self.realTemp)
@@ -109,15 +110,23 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.processoutput=self.simsystem.realTime(self.realTemp,self.currentTime)
 
 
-
         #************STATIC CODE************
         self.loadqueues()
 
+
     # ************YOUR CODE GOES HERE************
+    #use this method for asynchronous function calls (that could use a separate thread)
+    def asychronousMethod(self):
+        for i in range(50):
+            time.sleep(1)
+            print(i)
+
+
     #Define callback functions for custom controls here
     def buttonpush(self,val):
         print(self.sender())
         print('here'+str(val))
+        self.startThread(self.asychronousMethod)
 
     def setpointchange(self,val):
         print('here'+str(val))
@@ -152,6 +161,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         # setup widgets
         self.plot = Plotter(self.Mainplot, variables=self.watchlist)
         # setup threads
+        self.lock=threading.Lock
         self.threadpool = QThreadPool()
         self.dispQueue = Queue()
         dispWorker = Worker(self.update_display)
@@ -326,6 +336,11 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
             self.verticalLayout_6.addLayout(vbox)
         else:
             parent.addLayout(vbox)
+    def setStatus(self,text):
+        self.Status.setText(text)
+    def startThread(self,callback):
+        wrkr = Worker(callback)
+        self.threadpool.start(wrkr)
 
 app=QApplication(sys.argv)
 window=MainWindow()

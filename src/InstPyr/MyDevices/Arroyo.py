@@ -7,6 +7,13 @@ from dataclasses import dataclass
 @dataclass
 class CommandList:
     CURRENT_SET:str='I_set'
+    PHOTODIODE:str='P'
+    CURRENT:str='I'
+    VOLTAGE:str='V'
+    TEMP_SET:str='T_set'
+    TEMP:str='T'
+    CURRENT_TEC:str='I_TEC'
+    VOLTAGE_TEC:str='V_TEC'
 
 
 class myArroyo():
