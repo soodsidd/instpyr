@@ -72,12 +72,12 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
 
         #Define Controls,Define callback functions past 'MainLoop'
-        self.addNumeric('Setpoint',self.setpointchange,-1,1,0.1)
-        self.addButton('Push Me',self.buttonpush,latching=True)
+        self.addNumeric('Setpoint',-1,1,0.1,callback=self.setpointchange)
+        self.addButton('Push Me',latching=True,callback=self.buttonpush)
         subcon=self.addGroup('Sub Controls')
-        self.addNumeric('RampRate (C/sec)',self.filterchange,1,1000,1,1,parent=subcon)
-        self.addDropdown('Instrument List',['2001dn','2002dn'],self.dropdownchanged,parent=subcon)
-        self.addButton('Connect',self.instconnect, parent=subcon)
+        self.addNumeric('RampRate (C/sec)',1,1000,1,1,parent=subcon,callback=self.filterchange)
+        self.addDropdown('Instrument List',['2001dn','2002dn'],parent=subcon,callback=self.dropdownchanged)
+        self.addButton('Connect', parent=subcon,callback=self.instconnect)
 
 
         #setup a 'watch' for every variable that you want to plot
@@ -274,18 +274,19 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
             self.annotatemsg.setText('')
     def variableProbe(self,name):
         return eval('self.'+name)
-    def addButton(self,name,callback,latching=False,parent=None):
+    def addButton(self,name,latching=False,parent=None,callback=None):
         btn=QtWidgets.QPushButton(name)
         font = QtGui.QFont()
         font.setPointSize(8)
         btn.setFont(font)
         btn.setCheckable(latching)
-        btn.clicked['bool'].connect(callback)
+        if callback is not None:
+            btn.clicked['bool'].connect(callback)
         if parent is None:
             self.verticalLayout_6.addWidget(btn)
         else:
             parent.addWidget(btn)
-    def addNumeric(self,label,callback,min=0,max=100,stepsize=1.0,default=0,parent=None):
+    def addNumeric(self,label,min=0,max=100,stepsize=1.0,default=0,parent=None,callback=None):
         font = QtGui.QFont()
         font.setPointSize(8)
         label=QtWidgets.QLabel(label)
@@ -306,7 +307,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         else:
             parent.addLayout(hbox)
         doubleEdit.setKeyboardTracking(False)
-        doubleEdit.valueChanged['double'].connect(callback)
+        if callback is not None:
+            doubleEdit.valueChanged['double'].connect(callback)
     def addGroup(self,name,parent=None):
         gbox=QtWidgets.QGroupBox(name)
         glayout=QtWidgets.QVBoxLayout(gbox)
@@ -315,7 +317,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         gbox.setFont(font)
         self.verticalLayout_6.addWidget(gbox)
         return glayout
-    def addDropdown(self, label,items,callback,parent=None):
+    def addDropdown(self, label,items,parent=None,callback=None):
         vbox=QtWidgets.QVBoxLayout()
         label=QtWidgets.QLabel(label)
         font = QtGui.QFont()
@@ -326,8 +328,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         drpdown.setFont(font)
         drpdown.addItems(items)
         drpdown.setCurrentIndex(0)
-
-        drpdown.currentIndexChanged['QString'].connect(callback)
+        if callback is not None:
+            drpdown.currentIndexChanged['QString'].connect(callback)
 
         vbox.addWidget(label)
         vbox.addWidget(drpdown)
