@@ -73,7 +73,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
         #Define Controls,Define callback functions past 'MainLoop'
         self.addNumeric('Setpoint',-1,1,0.1,callback=lambda val: setattr(self,'scalefactor',val))
-        self.pushbtn=self.addButton('Push Me',latching=True,callback=self.buttonpush) #can manipulate pushbtn later if necessary
+        self.pushbtn=self.addButton('Push Me',latching=True,callback=lambda val: self.startThread(self.asychronousMethod) if val is True else print('this')) #can manipulate pushbtn later if necessary
         subcon=self.addGroup('Sub Controls')
         self.addNumeric('RampRate (C/sec)',1,1000,1,1,parent=subcon,callback= lambda val: setattr(self.rampfilter,'maxrate',val))
         self.addDropdown('Instrument List',['2001dn','2002dn'],parent=subcon,callback=self.dropdownchanged)
@@ -123,12 +123,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         self.pushbtn.setChecked(False)
 
 
-    #Define callback functions for custom controls here
-    def buttonpush(self,val):
-        print(self.sender())
-        print('here'+str(val))
-        self.startThread(self.asychronousMethod)
 
+    #Define callbacks functions for your controls here
     def instconnect(self,val):
         print(val)
 
