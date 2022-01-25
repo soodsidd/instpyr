@@ -72,10 +72,10 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
 
         #Define Controls,Define callback functions past 'MainLoop'
-        self.addNumeric('Setpoint',-1,1,0.1,callback=self.setpointchange)
+        self.addNumeric('Setpoint',-1,1,0.1,callback=lambda val: setattr(self,'scalefactor',val))
         self.addButton('Push Me',latching=True,callback=self.buttonpush)
         subcon=self.addGroup('Sub Controls')
-        self.addNumeric('RampRate (C/sec)',1,1000,1,1,parent=subcon,callback=self.filterchange)
+        self.addNumeric('RampRate (C/sec)',1,1000,1,1,parent=subcon,callback= lambda val: setattr(self.rampfilter,'maxrate',val))
         self.addDropdown('Instrument List',['2001dn','2002dn'],parent=subcon,callback=self.dropdownchanged)
         self.addButton('Connect', parent=subcon,callback=self.instconnect)
 
@@ -127,14 +127,6 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         print(self.sender())
         print('here'+str(val))
         self.startThread(self.asychronousMethod)
-
-    def setpointchange(self,val):
-        print('here'+str(val))
-        self.scalefactor=val
-
-    def filterchange(self,val):
-        print('here' + str(val))
-        self.rampfilter.maxrate=val
 
     def instconnect(self,val):
         print(val)
