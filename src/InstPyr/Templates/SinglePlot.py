@@ -73,7 +73,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
 
         #Define Controls,Define callback functions past 'MainLoop'
         self.addNumeric('Setpoint',-1,1,0.1,callback=lambda val: setattr(self,'scalefactor',val))
-        self.addButton('Push Me',latching=True,callback=self.buttonpush)
+        self.pushbtn=self.addButton('Push Me',latching=True,callback=self.buttonpush) #can manipulate pushbtn later if necessary
         subcon=self.addGroup('Sub Controls')
         self.addNumeric('RampRate (C/sec)',1,1000,1,1,parent=subcon,callback= lambda val: setattr(self.rampfilter,'maxrate',val))
         self.addDropdown('Instrument List',['2001dn','2002dn'],parent=subcon,callback=self.dropdownchanged)
@@ -120,6 +120,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         for i in range(50):
             time.sleep(1)
             print(i)
+        self.pushbtn.setChecked(False)
 
 
     #Define callback functions for custom controls here
@@ -278,6 +279,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
             self.verticalLayout_6.addWidget(btn)
         else:
             parent.addWidget(btn)
+        return btn
     def addNumeric(self,label,min=0,max=100,stepsize=1.0,default=0,parent=None,callback=None):
         font = QtGui.QFont()
         font.setPointSize(8)
@@ -301,6 +303,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
         doubleEdit.setKeyboardTracking(False)
         if callback is not None:
             doubleEdit.valueChanged['double'].connect(callback)
+        return doubleEdit
     def addGroup(self,name,parent=None):
         gbox=QtWidgets.QGroupBox(name)
         glayout=QtWidgets.QVBoxLayout(gbox)
@@ -330,6 +333,8 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
             self.verticalLayout_6.addLayout(vbox)
         else:
             parent.addLayout(vbox)
+
+        return drpdown
     def setStatus(self,text):
         self.Status.setText(text)
     def startThread(self,callback):
