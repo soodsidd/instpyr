@@ -148,7 +148,7 @@ class MainWindow(QMainWindow,SinglePlotUI.Ui_MainWindow):
     def _postInit(self):
         # ************STATIC CODE************
         # setup widgets
-        self.plot = Plotter(self.Mainplot, variables=self.watchlist)
+        self.plot = Plotter(self.Mainplot,datetimeaxis=False, variables=self.watchlist)
         # setup threads
         self.lock=threading.Lock
         self.threadpool = QThreadPool()
