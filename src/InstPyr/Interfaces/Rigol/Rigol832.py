@@ -4,10 +4,10 @@ from ..Common.interface import  interface
 from visa import *
 import time
 
-_delay=0.01
+_delay=0.1
 
 class Rigol832(interface):
-    def __init__(self):
+    def __init__(self, deviceId=None):
         super().__init__(self)
         self.analogmode='CV'
         self.currentchannel=1
@@ -15,7 +15,10 @@ class Rigol832(interface):
             self.rm=pyvisa.ResourceManager()
             self.instrument_list=self.rm.list_resources()
             print(self.instrument_list)
-            self.address=[elem for elem in self.instrument_list if (elem.find('USB')!=-1) and elem.find('DP')!=-1]
+            if deviceId is None:
+                self.address=[elem for elem in self.instrument_list if (elem.find('USB')!=-1) and elem.find('DP')!=-1]
+            else:
+                self.address=[elem for elem in self.instrument_list if (elem.find('USB')!=-1) and elem.find(deviceId)!=-1]
             if self.address.__len__() == 0:
                 self.status = "Not Connected"
                 # print("Could not connect to device")
@@ -155,6 +158,6 @@ class Rigol832(interface):
 if __name__=='__main__':
     mydevice=Rigol832()
     mydevice.setDigitalVoltage(10,1)
-    mydevice.write_digital(1,1)
+    mydevice.write_digital(1,0)
 
 

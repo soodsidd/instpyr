@@ -28,10 +28,10 @@ class TuningStatus:
     FINE_READY=5
 
 class PID:
-    def __init__(self,Kp,Ki,Kd, out_min=-999999,out_max=999999):
+    def __init__(self,Kp,Ti,Td, out_min=-999999,out_max=999999):
         self.Kp=Kp
-        self.Ki=Ki
-        self.Kd=Kd
+        self.Ki=self.Kp/Ti if Ti is not 0 else 0
+        self.Kd=self.Kp*Td
         self.limits=[out_min,out_max]
         self.outmax=out_max
         self.outmin=out_min
