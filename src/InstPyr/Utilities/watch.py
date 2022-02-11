@@ -3,13 +3,14 @@ import _ctypes
 
 class watch:
     #use this class to define a 'watch' variable- that you will log and plot
-    def __init__(self,name, variableName=None,callfunc=None, object=None,buffer=10,precision=2):
+    def __init__(self,name, variableName=None,callfunc=None, object=None,buffer=10,precision=2,plot=0):
         self.object = object
         self.variableName=variableName
         self.callfunc = callfunc
         self.name = name
         self.precision=precision
         self.buffersize=buffer
+        self.plot=plot
         self.buffer = collections.deque(maxlen=buffer)
         for i in range(buffer):
             self.buffer.append(0)

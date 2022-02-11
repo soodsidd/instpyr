@@ -39,7 +39,7 @@ from varname import nameof
 class MainWindow(QMainWindow,DualPlot_Bkend):
     def __init__(self):
         # ************STATIC CODE************
-        super(self.__class__, self).__init__(PIDMode=True)
+        super(self.__class__, self).__init__(PIDMode=True,ATMode=False)
 
         # ************YOUR CODE GOES HERE************
         # setup interface and devices
@@ -64,6 +64,7 @@ class MainWindow(QMainWindow,DualPlot_Bkend):
         subcon = self.addGroup('Sub Controls')
         self.addNumeric('RampRate (C/sec)', 1, 1000, 1, 1, parent=subcon,
                         callback=lambda val: setattr(self.rampfilter, 'maxrate', val))
+        self.addTextInput('Setpoints','25,50,70,85,120,25,5,-10')
         # self.addDropdown('Instrument List',['2001dn','2002dn'],parent=subcon,callback=self.dropdownchanged)
         # self.addButton('Connect', parent=subcon,callback=self.instconnect)
 
@@ -71,9 +72,9 @@ class MainWindow(QMainWindow,DualPlot_Bkend):
         self.watchlist.append(watch('Real Temperature (C)', nameof(self.PV), callfunc=self.variableProbe))
         self.watchlist.append(
             watch('Real Temp(filt) (C)', nameof(self.realTemp_filtered), callfunc=self.variableProbe))
-        self.watchlist.append(watch('Control Output', nameof(self.controlsig), callfunc=self.variableProbe))
-        self.watchlist.append(watch('Process Temperature (C)', nameof(self.procTemp), callfunc=self.variableProbe))
-        self.watchlist.append(watch('Lid Temperature (C)', nameof(self.lidTemp), callfunc=self.variableProbe))
+        self.watchlist.append(watch('Control Output', nameof(self.controlsig), callfunc=self.variableProbe,plot=1))
+        self.watchlist.append(watch('Process Temperature (C)', nameof(self.procTemp), callfunc=self.variableProbe,plot=1))
+        self.watchlist.append(watch('Lid Temperature (C)', nameof(self.lidTemp), callfunc=self.variableProbe,plot=1))
 
         # ************STATIC CODE************
         self._postInit()
@@ -93,9 +94,9 @@ class MainWindow(QMainWindow,DualPlot_Bkend):
             error = self.setpoint - self.PV
             print(error)
             self.controlsig = self.PID.apply(error, self.currentTime)
-
-        if self.ATactive and self.PIDAT is not None:
-            self.autotuningRoutine()
+        #
+        # if self.ATactive and self.PIDAT is not None:
+        #     self.autotuningRoutine()
 
         # ************STATIC CODE************
         self.loadqueues()

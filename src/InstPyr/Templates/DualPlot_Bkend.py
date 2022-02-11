@@ -33,6 +33,8 @@ else:
     from InstPyr.Utilities.shiftregister import shiftregister
     from InstPyr.Control.Filter import MyFilter,RateLimiter
     from InstPyr.Control.Waveform import *
+    from InstPyr.Control.PID import PID,PIDAutotuneRT, TuningStatus
+
 
 
 from varname import nameof
@@ -49,7 +51,7 @@ class Worker(QRunnable):
         self.fn(*self.args, **self.kwargs)
 
 class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
-    def __init__(self, PIDMode=True):
+    def __init__(self, PIDMode=True, ATMode=True):
         #************STATIC CODE************
         # super(self.__class__,self).__init__()
         self._appsetup()
@@ -69,40 +71,51 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
             self.PIDenable=True
             self.PID=PID(self.P,self.I,self.D,self.outmin,self.outmax)
 
+            # PID controls:
+            self.pidgrp = self.addGroup('PID control')
+            self.addNumeric('Setpoint', -1000, 1000, 0.1, 0, self.pidgrp,
+                            callback=lambda val: setattr(self, 'setpoint', val))
+            self.Pctrl = self.addNumeric('P', 0, 1000, 0.1, 0, self.pidgrp, callback=self.pidchange)
+            self.Ictrl = self.addNumeric('I', 0, 1000, 0.1, 1000, self.pidgrp, callback=self.pidchange)
+            self.Dctrl = self.addNumeric('D', 0, 1000, 0.1, 0, self.pidgrp, callback=self.pidchange)
+            self.outminctrl = self.addNumeric('OutMin', -1000, 1000, 0.1, 0, self.pidgrp, callback=self.pidchange)
+            self.outmaxctrl = self.addNumeric('OutMax', -1000, 1000, 0.1, 100, self.pidgrp, callback=self.pidchange)
 
-            #Autotuning Variables
-            self.PIDAT=None
-            self.ATprevStatus=0
-            self.ATstatus=0
-            self.ATactive=False
-            self.ATsetpoint=0
-            self.ATmethod=0
-            self.ATCoarseAmp=0
-            self.ATFineAmp=0
-            self.ATcycles=3
+            self.addButton('DisablePID', latching=True, parent=self.pidgrp,
+                           callback=lambda val: setattr(self, 'PIDenable', not val))
+            self.addNumeric('Direct', -1000, 1000, 0.1, 0, self.pidgrp,
+                            callback=lambda val: setattr(self, 'controlsig', val))
+
+            if ATMode:
+                #Autotuning Variables
+                self.PIDAT=None
+                self.ATprevStatus=0
+                self.ATstatus=0
+                self.ATactive=False
+                self.ATsetpoint=0
+                self.ATmethod=0
+                self.ATCoarseAmp=0
+                self.ATFineAmp=0
+                self.ATcycles=3
+                # PID autotuning controls:
+                self.ATgroup = self.addGroup('Autotuning', self.pidgrp)
+                self.addNumeric('AT Setpoint', -1000, 1000, 0.1, 0, self.ATgroup,
+                                callback=lambda val: setattr(self, 'ATsetpoint', val))
+                self.addNumeric('AT Coarse Amp', -1000, 1000, 0.1, 0, self.ATgroup,
+                                callback=lambda val: setattr(self, 'ATCoarseAmp', val))
+                self.addNumeric('AT Fine Amp', -1000, 1000, 0.1, 0, self.ATgroup,
+                                callback=lambda val: setattr(self, 'ATFineAmp', val))
+                self.addNumeric('AT Cycles', 0, 10, 1, 3, parent=self.ATgroup,
+                                callback=lambda val: setattr(self, 'ATcycles', val))
+                self.addDropdown('AT Method', ['ZN- P', 'ZN-PI', 'ZN-PID', 'TL-PI', 'TL-PID'], parent=self.ATgroup,
+                                 callback=lambda val: setattr(self, 'ATmethod', val))
+                self.ATbtn = self.addButton('Autotune!', latching=True, parent=self.ATgroup,
+                                            callback=lambda val: self.autotuningTrigger(val))
 
 
-            #PID controls:
-            self.pidgrp=self.addGroup('PID control')
-            self.addNumeric('Setpoint',-1000,1000,0.1,0,self.pidgrp,callback=lambda val: setattr(self,'setpoint',val))
-            self.Pctrl=self.addNumeric('P',0,1000,0.1,0,self.pidgrp,callback=self.pidchange)
-            self.Ictrl=self.addNumeric('I',0,1000,0.1,1000,self.pidgrp,callback=self.pidchange)
-            self.Dctrl=self.addNumeric('D',0,1000,0.1,0,self.pidgrp,callback=self.pidchange)
-            self.outminctrl=self.addNumeric('OutMin',-1000,1000,0.1,0,self.pidgrp,callback=self.pidchange)
-            self.outmaxctrl=self.addNumeric('OutMax',-1000,1000,0.1,100,self.pidgrp,callback=self.pidchange)
-
-            self.addButton('DisablePID',latching=True,parent=self.pidgrp,callback=lambda val:setattr(self,'PIDenable',not val))
-            self.addNumeric('Direct',-1000,1000,0.1,0, self.pidgrp,callback=lambda val:setattr(self,'controlsig',val))
 
 
-            #PID autotuning controls:
-            self.ATgroup=self.addGroup('Autotuning',self.pidgrp)
-            self.addNumeric('AT Setpoint',-1000,1000,0.1,0,self.ATgroup,callback=lambda val:setattr(self,'ATsetpoint',val))
-            self.addNumeric('AT Coarse Amp',-1000,1000,0.1,0,self.ATgroup,callback=lambda val:setattr(self,'ATCoarseAmp',val))
-            self.addNumeric('AT Fine Amp',-1000,1000,0.1,0,self.ATgroup,callback=lambda val:setattr(self,'ATFineAmp',val))
-            self.addNumeric('AT Cycles',0,10,1,3,parent=self.ATgroup,callback=lambda val: setattr(self,'ATcycles',val))
-            self.addDropdown('AT Method',['ZN- P','ZN-PI','ZN-PID','TL-PI','TL-PID'], parent=self.ATgroup,callback=lambda val: setattr(self,'ATmethod',val))
-            self.ATbtn=self.addButton('Autotune!',latching=True,parent=self.ATgroup,callback=lambda val:self.autotuningTrigger(val) )
+
 
 
 
@@ -196,8 +209,8 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
     def _postInit(self):
         # ************STATIC CODE************
         # setup widgets
-        self.plot_top = Plotter(self.Mainplot_top,datetimeaxis=False, variables=self.watchlist)
-        self.plot_bottom = Plotter(self.Mainplot_bottom,datetimeaxis=False, variables=self.watchlist)
+        self.plot_top = Plotter(self.Mainplot_top,datetimeaxis=False, variables=[x for x in self.watchlist if x.plot==0])
+        self.plot_bottom = Plotter(self.Mainplot_bottom,datetimeaxis=False, variables=[x for x in self.watchlist if x.plot==1])
 
         # setup threads
         self.lock=threading.Lock
@@ -386,6 +399,28 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
             parent.addLayout(vbox)
 
         return drpdown
+    def addTextInput(self, label,placeholder,parent=None,callback=None):
+        vbox=QtWidgets.QVBoxLayout()
+        label=QtWidgets.QLabel(label)
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        label.setFont(font)
+
+        linedit=QtWidgets.QLineEdit()
+        linedit.setFont(font)
+        linedit.setPlaceholderText(placeholder)
+        if callback is not None:
+            linedit.editingFinished.connect(callback)
+
+        vbox.addWidget(label)
+        vbox.addWidget(linedit)
+
+        if parent==None:
+            self.verticalLayout_6.addLayout(vbox)
+        else:
+            parent.addLayout(vbox)
+
+        return linedit
     def setStatus(self,text):
         print(text)
     def startThread(self,callback):

@@ -382,6 +382,29 @@ class SinglePlot_Bkend(SinglePlotUI.Ui_MainWindow):
             parent.addLayout(vbox)
 
         return drpdown
+
+    def addTextInput(self, label, placeholder, parent=None, callback=None):
+        vbox = QtWidgets.QVBoxLayout()
+        label = QtWidgets.QLabel(label)
+        font = QtGui.QFont()
+        font.setPointSize(8)
+        label.setFont(font)
+
+        linedit = QtWidgets.QLineEdit()
+        linedit.setFont(font)
+        linedit.setPlaceholderText(placeholder)
+        if callback is not None:
+            linedit.editingFinished.connect(callback)
+
+        vbox.addWidget(label)
+        vbox.addWidget(linedit)
+
+        if parent == None:
+            self.verticalLayout_6.addLayout(vbox)
+        else:
+            parent.addLayout(vbox)
+
+        return linedit
     def setStatus(self,text):
         self.Status.setText(text)
     def startThread(self,callback):
