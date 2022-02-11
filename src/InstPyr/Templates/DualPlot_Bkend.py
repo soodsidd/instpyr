@@ -73,7 +73,7 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
 
             # PID controls:
             self.pidgrp = self.addGroup('PID control')
-            self.addNumeric('Setpoint', -1000, 1000, 0.1, 0, self.pidgrp,
+            self.setpointctrl=self.addNumeric('Setpoint', -1000, 1000, 0.1, 0, self.pidgrp,
                             callback=lambda val: setattr(self, 'setpoint', val))
             self.Pctrl = self.addNumeric('P', 0, 1000, 0.1, 0, self.pidgrp, callback=self.pidchange)
             self.Ictrl = self.addNumeric('I', 0, 1000, 0.1, 1000, self.pidgrp, callback=self.pidchange)
