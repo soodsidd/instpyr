@@ -423,7 +423,7 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
 
         return linedit
     def setStatus(self,text):
-        print(text)
+        self.Status.setText(text)
     def startThread(self,callback):
         wrkr = Worker(callback)
         self.threadpool.start(wrkr)
