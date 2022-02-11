@@ -399,7 +399,7 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
             parent.addLayout(vbox)
 
         return drpdown
-    def addTextInput(self, label,placeholder,parent=None,callback=None):
+    def addTextInput(self, label,placeholder,default='',parent=None,callback=None):
         vbox=QtWidgets.QVBoxLayout()
         label=QtWidgets.QLabel(label)
         font = QtGui.QFont()
@@ -409,6 +409,7 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
         linedit=QtWidgets.QLineEdit()
         linedit.setFont(font)
         linedit.setPlaceholderText(placeholder)
+        linedit.setText(default)
         if callback is not None:
             linedit.textChanged['QString'].connect(callback)
 

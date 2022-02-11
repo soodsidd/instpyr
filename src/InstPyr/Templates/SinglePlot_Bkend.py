@@ -383,7 +383,7 @@ class SinglePlot_Bkend(SinglePlotUI.Ui_MainWindow):
 
         return drpdown
 
-    def addTextInput(self, label, placeholder, parent=None, callback=None):
+    def addTextInput(self, label, placeholder, default='',parent=None, callback=None):
         vbox = QtWidgets.QVBoxLayout()
         label = QtWidgets.QLabel(label)
         font = QtGui.QFont()
@@ -393,6 +393,8 @@ class SinglePlot_Bkend(SinglePlotUI.Ui_MainWindow):
         linedit = QtWidgets.QLineEdit()
         linedit.setFont(font)
         linedit.setPlaceholderText(placeholder)
+        linedit.setText(default)
+
         if callback is not None:
             linedit.textChanged['QString'].connect(callback)
 
