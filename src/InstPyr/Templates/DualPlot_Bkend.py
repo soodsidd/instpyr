@@ -410,7 +410,7 @@ class DualPlot_Bkend(DualPlotUI.Ui_MainWindow):
         linedit.setFont(font)
         linedit.setPlaceholderText(placeholder)
         if callback is not None:
-            linedit.editingFinished.connect(callback)
+            linedit.textChanged['Qstring'].connect(callback)
 
         vbox.addWidget(label)
         vbox.addWidget(linedit)
