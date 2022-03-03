@@ -26,7 +26,7 @@ class myarduino(interface):
             self.board.analog[pin].enable_reporting()
 
         for pin in aout:
-            self.board.analog[pin].mode=pyfirmata.PWM
+            self.board.digital[pin].mode=pyfirmata.PWM
 
 
 

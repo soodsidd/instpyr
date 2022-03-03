@@ -25,6 +25,8 @@ class thermocouple():
     def _applyCalibration(self, rawTemp):
         if self.calfunc is not None:
             return float(self.calfunc(rawTemp))
+        else:
+            return self.currentTemp
 
     def calibrate(self,Xin,Yin):
         self.calX=Xin

@@ -3,8 +3,11 @@ import numpy as np
 from ..Utilities.shiftregister import shiftregister
 import time
 class MyFilter:
-    def __init__(self):
+    def __init__(self, size=10):
         self.lowpassfilt=None
+        self.buffersize=size
+        self.buffer=shiftregister(size)
+
 
     @classmethod
     def lowpass(cls,data,cutoff, sampling):
@@ -24,13 +27,14 @@ class MyFilter:
         #TODO figure out how lowpass filtering works
         return yout
 
-    @classmethod
-    def movingaverage(cls,data,N=0):
+    def movingaverage(self,data):
         #sampling rate in seconds
-        if N==0 or N>len(data):
-            return np.average(data)
-        else:
-            return np.average(data[len(data)-N:len(data)-1])
+        self.buffer.push(data)
+        return np.average(self.buffer.data())
+        # if N==0 or N>len(data):
+        #     return np.average(data)
+        # else:
+        #     return np.average(data[len(data)-N:len(data)-1])
 
     # @classmethod
     # # def rampfilter(cls,data,rate):
@@ -64,7 +68,6 @@ class RateLimiter(MyFilter):
         self.currentTime=self.newtime
         self.output=self.output+self.rate*elapsedtime
         return self.output
-
 
 
 
