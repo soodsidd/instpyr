@@ -152,7 +152,7 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
     def mainloop_static(self,displayinterval=1,loginterval=1):
         #Timekeeping
         newtime = time.perf_counter()
-        elapsedtime = newtime - self.currentTime
+        self.elapsedtime = newtime - self.currentTime
         self.currentTime = newtime
 
         if self.pidmode:

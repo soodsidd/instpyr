@@ -1,4 +1,6 @@
 import os
+import time
+
 path=os.getcwd()
 if 'InstPyr\Templates' in path:
     from src.InstPyr.Templates.Template_Backend import *
@@ -79,9 +81,10 @@ class MainWindow(QMainWindow,Template_Backend):
 
 
         #************STATIC CODE************
-        self.mainloop_static(displayinterval=100)
+        self.mainloop_static(displayinterval=100,loginterval=10)
         #plot every 100th datapoint
 
+        print(self.elapsedtime)
 
 #************STATIC CODE************
 app=QApplication(sys.argv)

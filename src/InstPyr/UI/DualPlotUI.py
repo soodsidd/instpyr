@@ -80,6 +80,7 @@ class Ui_MainWindow(object):
         self.Sampling.setFont(font)
         self.Sampling.setDecimals(1)
         self.Sampling.setMinimum(0.1)
+        self.Sampling.setMaximum(1000.0)
         self.Sampling.setSingleStep(0.1)
         self.Sampling.setProperty("value", 1.0)
         self.Sampling.setObjectName("Sampling")
