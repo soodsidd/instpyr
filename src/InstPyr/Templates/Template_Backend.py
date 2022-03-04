@@ -16,6 +16,7 @@ path=os.getcwd()
 curr=os.path.basename(path)
 if curr=='Templates' or 'Examples':
     from src.InstPyr.UI import DualPlotUI
+    from src.InstPyr.UI.CustomWidgets.LedIndicatorWidget import LedIndicator
     import src.InstPyr.Interfaces.simulator as simulator
     from src.InstPyr.Plotting.PlotterWatch import MyPlotterWatch as Plotter
     from src.InstPyr.Logging import Logger
@@ -28,6 +29,8 @@ if curr=='Templates' or 'Examples':
     from src.InstPyr.Utilities.watch import watch
 else:
     from InstPyr.UI import DualPlotUI
+    from InstPyr.UI.CustomWidgets.LedIndicatorWidget import LedIndicator
+
     import InstPyr.Interfaces.simulator as simulator
     from InstPyr.Plotting.PlotterWatch import MyPlotterWatch as Plotter
     from InstPyr.Logging import Logger
@@ -71,6 +74,7 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
         self.logfilename = ''
         self.logenable = False
         self.currentTime = time.perf_counter()
+        self.datapointcount=0
         if not DUALPLOT:
             self.Mainplot_2.setVisible(False)
 
@@ -145,7 +149,7 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
 
 
 
-    def mainloop_static(self):
+    def mainloop_static(self,displayinterval=1,loginterval=1):
         #Timekeeping
         newtime = time.perf_counter()
         elapsedtime = newtime - self.currentTime
@@ -162,12 +166,9 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
                 self.autotuningRoutine()
 
         # ************STATIC CODE************
-        self.loadqueues()
+        self.loadqueues(displayinterval,loginterval)
 
 
-
-        #************STATIC CODE************
-        self.loadqueues()
 
 
 
@@ -271,18 +272,22 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
             name = item.variableName
             temp[name] = item
         self.watchlist = temp
-    def loadqueues(self):
+    def loadqueues(self,displayinterval,loginterval):
         vardata = {}
         for watch in self.watchlist.values():
             vardata[watch.name] = watch.read()
         data = [datetime.now(), vardata]
-        self.dispQueue.put(data)
-        if self.logenable:
-            try:
-                event = self.eventQueue.get(timeout=0.1)
-                self.logQueue.put(data + [event])
-            except Exception:
-                self.logQueue.put(data)
+        if self.datapointcount%displayinterval==0:
+            self.dispQueue.put(data)
+        if self.datapointcount%loginterval==0:
+            if self.logenable:
+                try:
+                    event = self.eventQueue.get(timeout=0.1)
+                    self.logQueue.put(data + [event])
+                except Exception:
+                    self.logQueue.put(data)
+
+        self.datapointcount+=1
     def update_display(self):
         while(True):
             data=self.dispQueue.get(timeout=1000)
@@ -453,8 +458,29 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
             parent.addLayout(vbox)
 
         return linedit,label
+
+    def addIndicator(self,label,default=False,parent=None):
+        hbox=QtWidgets.QVBoxLayout()
+        label=QtWidgets.QLabel(label)
+        font=QtGui.QFont()
+        font.setPointSize(8)
+        label.setFont(font)
+
+        Led=LedIndicator()
+        Led.setChecked(default)
+        hbox.addWidget(label)
+        hbox.addWidget(Led)
+        hbox.addStretch(1)
+
+        if parent==None:
+            self.horizontalLayout_2.addWidget(label)
+            self.horizontalLayout_2.addWidget(Led)
+            self.horizontalLayout_2.addStretch(1)
+
+        return Led
+
     def setStatus(self,text):
-        self.Status.setText(text)
+        self.StatusMsg.setText(text)
     def startThread(self,callback):
         wrkr = Worker(callback)
         self.threadpool.start(wrkr)

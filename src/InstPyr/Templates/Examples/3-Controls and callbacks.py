@@ -34,7 +34,7 @@ class MainWindow(QMainWindow,Template_Backend):
 
         #Variables that will be controlled
         self.controlvar=0
-
+        self.valvestate=False
 
         #Define controls and callback functions
 
@@ -51,6 +51,8 @@ class MainWindow(QMainWindow,Template_Backend):
         self.addDropdown('Instrument List',['2001dn','2002dn'],parent=subcon,callback=self.dropdownchanged)
         self.addButton('Connect', parent=subcon,callback=self.instconnect)
 
+        #Add an indicator and save the object for future manipulation
+        self.valveindicator=self.addIndicator('Valve State',default=True)
 
         #setup a 'watch' for every variable that you want to plot and append that to 'watchlist'
         self.watchlist.append(watch('A single variable', nameof(self.variable),self.variableProbe))
@@ -69,6 +71,9 @@ class MainWindow(QMainWindow,Template_Backend):
                 self.mutex.unlock()
         except Exception as e:
             print(e)
+        self.valvestate=not self.valvestate
+        self.valveindicator.setChecked(self.valvestate)
+
         #PID assignments- Assign variable to control to self.PV, input self.controlsig to actuator
 
 
