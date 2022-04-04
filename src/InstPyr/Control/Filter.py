@@ -2,42 +2,41 @@ import scipy.signal as signal
 import numpy as np
 from ..Utilities.shiftregister import shiftregister
 import time
+from dataclasses import dataclass
+
+@dataclass
+class FilterTypes:
+    LOWPASS='lowpass'
+    HIGHPASS='highpass'
+    MOVINGAVERAGE='movavg'
+
 class MyFilter:
-    def __init__(self, size=10):
+    def __init__(self, buffersize=10,type=FilterTypes.LOWPASS,cutoff=0.1,samplingrate=1,order=3):
         self.lowpassfilt=None
-        self.buffersize=size
-        self.buffer=shiftregister(size)
+        self.buffersize=buffersize
+        self.filtertype = type
+        if self.filtertype==FilterTypes.LOWPASS or FilterTypes.HIGHPASS:
+            self.buffer=shiftregister(int(samplingrate/cutoff)*2)
 
+        self.cutoff=cutoff
+        self.samplingrate=samplingrate
+        self.order=order
+        self.sos=None
 
-    @classmethod
-    def lowpass(cls,data,cutoff, sampling):
-        # if self.lowpassfilt==None:
-        # b, a = signal.butter(10,cutoff,fs=sampling)
-        b,a=signal.butter(10,cutoff,fs=sampling)
-        # print(data)
-        # print(b)
-        # print(a)
-        y=signal.filtfilt(b,a,data)
-        # print(y)
-        yout=y[len(y)-1]
-        # # print(b)
-        # newval=signal.filtfilt(b,a,data,padlen=0)
-        # print(newval)
-        # return newval[len(newval)-1]
-        #TODO figure out how lowpass filtering works
-        return yout
-
-    def movingaverage(self,data):
-        #sampling rate in seconds
+    def nextVal(self,data):
         self.buffer.push(data)
-        return np.average(self.buffer.data())
-        # if N==0 or N>len(data):
-        #     return np.average(data)
-        # else:
-        #     return np.average(data[len(data)-N:len(data)-1])
-
-    # @classmethod
-    # # def rampfilter(cls,data,rate):
+        if self.filtertype==FilterTypes.LOWPASS:
+            if self.sos is None:
+                self.sos = signal.butter(self.order, self.cutoff, btype='lowpass', output='sos', fs=self.samplingrate)
+            y=signal.sosfilt(self.sos,self.buffer.data())
+            return y[-1]
+        elif self.filtertype==FilterTypes.HIGHPASS:
+            if self.sos is None:
+                self.sos = signal.butter(self.order, self.cutoff,btype='highpass', output='sos', fs=self.samplingrate)
+            y=signal.sosfilt(self.sos,self.buffer.data())
+            return y[-1]
+        elif self.filtertype==FilterTypes.MOVINGAVERAGE:
+            return np.average(self.buffer.data())
 
 class RateLimiter(MyFilter):
     def __init__(self,ratelimit):

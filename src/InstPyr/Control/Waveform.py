@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 #TODO- make parent class
 
 class triangle:
-    def __init__(self,sample:float,period:float,maxval=1,minval=0,duty=0.5):
-        self.sample_num = (int)(period / sample)
+    def __init__(self,samplerate:float,frequency:float,maxval=1,minval=0,duty=0.5):
+        self.sample_num = (int)(samplerate/frequency)
         self.signal = []
         self.currentindex = 0
         firstperiod=(int)(duty*self.sample_num)+1

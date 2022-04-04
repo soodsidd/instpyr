@@ -412,7 +412,7 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
         else:
             parent.addWidget(gbox)
         return glayout
-    def addDropdown(self, label,items,parent=None,callback=None):
+    def addDropdown(self, label,items,parent=None,callback=None,returntype='index'):
         vbox=QtWidgets.QVBoxLayout()
         label=QtWidgets.QLabel(label)
         font = QtGui.QFont()
@@ -424,7 +424,10 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
         drpdown.addItems(items)
         drpdown.setCurrentIndex(0)
         if callback is not None:
-            drpdown.currentIndexChanged['int'].connect(callback)
+            if returntype is 'index':
+                drpdown.currentIndexChanged['int'].connect(callback)
+            elif returntype is 'value':
+                drpdown.currentIndexChanged['QString'].connect(callback)
 
         vbox.addWidget(label)
         vbox.addWidget(drpdown)
