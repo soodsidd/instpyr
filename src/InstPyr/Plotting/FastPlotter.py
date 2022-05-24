@@ -8,12 +8,15 @@ import numpy as np
 # from cycler import cycler
 import numpy as np
 from ..Utilities.watch import watch
+from ..Plotting.pyqtgraphwidget import PyQtGraphWidget
 from varname import nameof
 linestyle_str = [
      ('solid', 'solid'),      # Same as (0, ()) or '-'
      ('dotted', 'dotted'),    # Same as (0, (1, 1)) or ':'
      ('dashed', 'dashed'),    # Same as '--'
      ('dashdot', 'dashdot')]  # Same as '-.'
+
+pens=['b','g','r','c','m','y','k','w']
 
 linestyle_tuple = [
      ('loosely dotted',        (0, (1, 10))),
@@ -52,15 +55,13 @@ class FastPlotter:
 
         self.horzoom=buffersize
         #connect plotwidget signals - these are signals from UI interactions with this widget
-        self.plotwidget.auto_scale.connect(self._toolbaractive)
         self.plotwidget.xvariable_sig.connect(self._xchanged)
-        self.plotwidget.yvarsLeft_sig.connect(self._yvarsLeft)
-        self.plotwidget.yvarsRight_sig.connect(self._yvarsRight)
+        self.plotwidget.yvars_sig.connect(self._yvarschanged)
         self.plotwidget.zoomsig.connect(self._horZoomChanged)
 
 
 
-        self.lines['Time']=_linedata('Time',buffersize= buffersize,Xaxis=True,Yaxis=False,SecYaxis=False,timedata=True)
+        self.lines['Time']=_linedata('Time',buffersize= buffersize,Xaxis=True,Yaxis=False,timedata=True)
 
         for item in variables:
             if isinstance(item,watch):
@@ -77,14 +78,12 @@ class FastPlotter:
     def initplots(self):
         self.xaxis=None
         self.ylines= {}
-        self.secylines= {}
         # for ref in self.plotrefs.keys():
         #     self.plotrefs[ref].remove()
         self.plotrefs={}
         self.plotwidget.clear()
         styleindex=0
 
-        self.plotwidget.reapplyformatting()
 
         #sort lines into x axis lines and y axis lines
         for key in self.lines.keys():
@@ -94,24 +93,21 @@ class FastPlotter:
             elif line.Yaxis:
                 self.ylines[line.name]=line
 
-        if len(self.secylines)>0:
-            stylebasis=True
-        else:
-            stylebasis=False
 
         #create a ref for each line
         for key in self.ylines.keys():
             line=self.ylines[key]
-            plot_ref=self.plotwidget.plot(x=self.xaxis.data,y=line.data,name=line.name)
+            plot_ref=self.plotwidget.plot(x=self.xaxis.data,y=line.data,name=line.name,pen=pens[styleindex])
             self.plotrefs[line.name]=plot_ref
+            styleindex+=1
 
         self.plotwidget.addLegend()
 
         self.legend=True
 
-
-
-
+    def _horZoomChanged(self,params):
+        self.horzoom=int(self.buffer*params/100)
+        print(params)
 
     def _xchanged(self,params):
         print(params)
@@ -124,44 +120,33 @@ class FastPlotter:
 
         self.initplots()
 
-    def _yvarsLeft(self,params):
+    def _yvarschanged(self,params):
         print(params)
         yvar=self.varlist[params[0]]
         yvarenable=params[1]
         self.lines[yvar].Yaxis=yvarenable
-        if yvarenable is True:
-            self.lines[yvar].SecYaxis=False
-        self.initplots()
-
-    def _yvarsRight(self,params):
-        print(params)
-        yvar = self.varlist[params[0]]
-        yvarenable = params[1]
-        self.lines[yvar].SecYaxis = yvarenable
-        if yvarenable is True:
-            self.lines[yvar].Yaxis = False
         self.initplots()
 
 
 
-    @property
-    def legend(self):
-        return self._legend
-    @legend.setter
-    def legend(self,val):
-        self._legend=val
-        if val==False:
-            if self.plotwidget.canvas.ax.get_legend() is not None:
-                self.plotwidget.canvas.ax.get_legend().remove()
-                if self.ax2 is not None:
-                    if self.ax2.get_legend() is not None:
-                        self.ax2.get_legend().remove()
-        else:
-            leg=self.plotwidget.canvas.ax.legend(loc=3)
-            if self.ax2 is not None:
-                # leg.remove()
-                self.ax2.legend(loc=4)
-                # self.ax2.add_artist(leg)
+    # @property
+    # def legend(self):
+    #     return self._legend
+    # @legend.setter
+    # def legend(self,val):
+    #     self._legend=val
+    #     if val==False:
+    #         if self.plotwidget.canvas.ax.get_legend() is not None:
+    #             self.plotwidget.canvas.ax.get_legend().remove()
+    #             if self.ax2 is not None:
+    #                 if self.ax2.get_legend() is not None:
+    #                     self.ax2.get_legend().remove()
+    #     else:
+    #         leg=self.plotwidget.canvas.ax.legend(loc=3)
+    #         if self.ax2 is not None:
+    #             # leg.remove()
+    #             self.ax2.legend(loc=4)
+    #             # self.ax2.add_artist(leg)
 
     @property
     def buffer(self):
@@ -187,7 +172,6 @@ class FastPlotter:
                     self.lines[key].update(watchdata[key])
 
         self._updateplots()
-        self._redraw()
 
 
 
@@ -197,10 +181,10 @@ class FastPlotter:
         lowind=0 if (plotlen-self.horzoom)<0 else (plotlen-self.horzoom)
         highind=plotlen
         for key in self.plotrefs.keys():
-            self.plotrefs[key].set_data(self.xaxis.data[lowind:highind], self.lines[key].data[lowind:highind])
+            self.plotrefs[key].setData(x=self.xaxis.data[lowind:highind], y=self.lines[key].data[lowind:highind])
             precision=self.lines[key].precision
-            self.plotrefs[key].set_label(key + ':' + f"{self.lines[key].latestpoint:.2f}")
-            self.legend=True
+            # self.plotrefs[key].set_label(key + ':' + f"{self.lines[key].latestpoint:.2f}")
+            # self.legend=True
 
 
 
@@ -209,28 +193,6 @@ class FastPlotter:
             self.lines[key].data=[]
             print('here')
 
-    def _redraw(self):
-        # update plot here
-        if self.autoscale:
-            self.plotwidget.canvas.ax.relim()
-            self.plotwidget.canvas.ax.autoscale()
-
-
-            if self.oneaxis and self.legend:
-                self.legend=True
-            if self.ax2 is not None:
-                self.ax2.relim()
-                self.ax2.autoscale()
-
-
-        self.plotwidget.canvas.draw_idle()
-
-    # def annotate(self,msg,timestamp=None):
-    #     firstkey = list(self.pltdata.keys())[0]
-    #     pltlen=len(self.pltdata[firstkey].xdata)
-    #     if timestamp==None:
-    #         #annotate at latest timestamp
-    #         self.plotwidget.canvas.ax.annotate(msg,(self.pltdata[firstkey].xdata[pltlen-1],self.pltdata[firstkey].ydata[pltlen-1]))
 
 
 
@@ -258,28 +220,29 @@ class _linedata:
 class _PlotTester(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.w=MplWidget()
+        self.w=PyQtGraphWidget()
 
         self.sense1=0
         self.sense2=1
         self.sense3=2
+        self.currenttime=0
 
         watch1=watch('Sense 1',nameof(self.sense1),callfunc=self.variableProbe)
         watch2 = watch('Sense 2', nameof(self.sense2), callfunc=self.variableProbe)
         watch3 = watch('Sense 3', nameof(self.sense3), callfunc=self.variableProbe)
         
         self.watchlist=[watch1,watch2,watch3]
-        self.myplot=MyPlotterWatch(self.w, variables=self.watchlist)
+        self.myplot=FastPlotter(self.w, variables=self.watchlist)
 
         self.setCentralWidget(self.w)
-        self.timer=QtCore.QTimer()
-        self.timer.setInterval(500)
-        self.timer.timeout.connect(self.updateTestPlot)
-        self.timer.start()
+        self.lastupdate=time.time()
+        self.updateTestPlot()
 
 
     def updateTestPlot(self):
-
+        now=time.time()
+        dt=now-self.lastupdate
+        self.currenttime+=dt
 
         self.sense1=105.23-np.random.randint(5)
         self.sense2=80.12-np.random.randint(5)
@@ -290,8 +253,10 @@ class _PlotTester(QMainWindow):
         for watch in self.watchlist:
             data[watch.name]=watch.read()
 
-        self.myplot.updatedata(datetime.now(),data)
-        
+        self.myplot.updatedata(self.currenttime,data)
+        self.lastupdate=now
+        QtCore.QTimer.singleShot(1, self.updateTestPlot)
+
 
 
     def variableProbe(self,name):
