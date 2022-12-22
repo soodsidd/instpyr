@@ -21,7 +21,7 @@ class MainWindow(QMainWindow,Template_Backend):
         self.mutex=QMutex()
 
         #setup default PID values
-        self.Pctrl.setValue(100)
+        self.Pctrl.setValue(1)
         self.Ictrl.setValue(10)
         self.Dctrl.setValue(0)
 
@@ -32,7 +32,7 @@ class MainWindow(QMainWindow,Template_Backend):
 
         #Setup interface and devices
         #A simple first order system
-        self.system=Plant([1],[100,1])
+        self.system=Plant([1],[100,10,1])
 
 
 
