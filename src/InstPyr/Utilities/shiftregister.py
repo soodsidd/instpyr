@@ -1,12 +1,13 @@
 import collections
+import numpy as np
 
 class shiftregister:
-    def __init__(self,size):
+    def __init__(self,size,initval=0):
         self.size=size
         self.buffer = collections.deque(maxlen=size)
         #initialize buffer
         for i in range(size):
-            self.buffer.append(0)
+            self.buffer.append(initval)
 
     def push(self,val):
         self.buffer.append(val)
@@ -22,6 +23,10 @@ class shiftregister:
 
     def data(self):
         return list(self.buffer)
+
+    def allequal(self):
+        data=np.array(list(self.buffer))
+        return np.all(data==data[0])
 
     @property
     def size(self):

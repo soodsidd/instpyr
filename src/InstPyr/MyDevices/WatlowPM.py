@@ -11,11 +11,15 @@ CONTROLMODE=1880
 OFFVAL=62
 AUTOVAL=10
 MANVAL=54
-
+SETPOINTMONITOR=2172
+COOLINGLOWPOWER=926
+HEATINGHIGHPOWER=898
 
 class WatlowPM_TCP():
     def __init__(self, IPaddr='172.20.20.20'):
         self.client=ModbusTcpClient(IPaddr)
+        self.coolinglowpower=0
+        self.heatinghighpower=100
 
     def connect(self):
         if self.client is not None:
@@ -26,6 +30,9 @@ class WatlowPM_TCP():
         return self._convertToFloat(bits)
 
     def readCurrentSetpoint(self):
+        bits = self._readLoHiRegisters(SETPOINTMONITOR)
+        return self._convertToFloat(bits)
+    def readUserSetSetpoint(self):
         bits = self._readLoHiRegisters(CURRENT_SETPOINT_ADDR)
         return self._convertToFloat(bits)
 
@@ -46,6 +53,24 @@ class WatlowPM_TCP():
         if setpoint>=SETPOINTLIMITS[0] and setpoint<=SETPOINTLIMITS[1]:
             bits=self._convertFloatToBits(setpoint)
             self._writeLoHiRegisters(CURRENT_SETPOINT_ADDR,bits)
+
+    def alwaysCoolingMode(self,Enable):
+        if Enable:
+            bits=self._convertFloatToBits(100)
+            self.coolinglowpower=100
+        elif not Enable:
+            bits=self._convertFloatToBits(0)
+            self.coolinglowpower=0
+        self._writeLoHiRegisters(COOLINGLOWPOWER, bits)
+
+    def heaterEnable(self,enable):
+        if enable:
+            bits = self._convertFloatToBits(100)
+            self.heatinghighpower = 100
+        elif not enable:
+            bits = self._convertFloatToBits(0)
+            self.heatinghighpower=0
+        self._writeLoHiRegisters(HEATINGHIGHPOWER,bits)
 
 
     def _writeLoHiRegisters(self,addr,bits):
