@@ -61,6 +61,13 @@ class MainWindow(QMainWindow,Template_Backend):
         self.mainloop_static()
 
 
+    def closeEvent(self, a0: QtGui.QCloseEvent):
+        #peform cleanup here
+
+
+        #**************STATIC CODE************
+        self.closeApp()
+
 #************STATIC CODE************
 app=QApplication(sys.argv)
 window=MainWindow()

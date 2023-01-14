@@ -44,7 +44,8 @@ else:
     from InstPyr.Utilities.watch import watch
 
 
-
+stop_threads=False
+STOPITEM=object()
 from varname import nameof
 #************STATIC CODE************
 class Worker(QRunnable):
@@ -56,7 +57,8 @@ class Worker(QRunnable):
 
     @pyqtSlot()
     def run(self):
-        self.fn(*self.args, **self.kwargs)
+        while not stop_threads:
+            self.fn(*self.args, **self.kwargs)
 
 class Template_Backend(DualPlotUI.Ui_MainWindow):
     def __init__(self, PIDMode=True, ATMode=True, DUALPLOT=True):
@@ -291,15 +293,20 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
     def update_display(self):
         while(True):
             data=self.dispQueue.get(timeout=1000)
+            if data is STOPITEM:
+                break
             self.dispQueue.task_done()
             time=data[0]
             vardata=data[1]
             self.plot_top.updatedata(time,vardata)
             self.plot_bottom.updatedata(time,vardata)
 
+
     def logdata(self):
         while True:
             data = self.logQueue.get()
+            if data is STOPITEM:
+                break
             self.logQueue.task_done()
             if self.logger is not None and self.logenable:
                 writedata=[data[0]]
@@ -487,3 +494,11 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
     def startThread(self,callback):
         wrkr = Worker(callback)
         self.threadpool.start(wrkr)
+
+
+    def closeApp(self):
+        print('here')
+        self.dispQueue.put(STOPITEM)
+        self.logQueue.put(STOPITEM)
+        global stop_threads
+        stop_threads=True

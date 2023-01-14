@@ -62,6 +62,7 @@ class MainWindow(QMainWindow,Template_Backend):
         self.mainloop_static()
 
 
+
 #************STATIC CODE************
 app=QApplication(sys.argv)
 window=MainWindow()
