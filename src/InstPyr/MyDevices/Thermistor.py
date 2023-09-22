@@ -3,7 +3,7 @@ from scipy import interpolate
 import numpy as np
 import math
 class Thermistor:
-    def __init__(self,interface:interface.interface,channel,divideresistance=9150,Bconstant=3380, REFTEMP=25,REFRES=10000, units=inf_enums.TempUnits.CELSIUS):
+    def __init__(self,interface:interface.interface,channel,interfacescale=1.0,divideresistance=9150,Bconstant=3380, REFTEMP=25,REFRES=10000, units=inf_enums.TempUnits.CELSIUS):
         self.interface=interface
         self.calX=[]
         self.calY=[]
@@ -14,6 +14,7 @@ class Thermistor:
         self.Bconstant=Bconstant
         self.reftemp=REFTEMP+273.15
         self.refres=10000
+        self.interface_scalefactor=interfacescale
 
 
     def _voltage_to_resistance(self,voltage):
@@ -31,13 +32,17 @@ class Thermistor:
         R0=self.refres
         B=self.Bconstant
         # T = 1.0 / ((1.0 / T0) + (1.0 / B) * math.log(resistance / R0)) - 273.15
-        T=B*T0/(B-T0*math.log(R0/resistance))-273.15
+        # print(resistance)
+        try:
+            T=B*T0/(B-T0*math.log(R0/resistance))-273.15
+        except Exception as e:
+            T=0
         # print(T)
         return T
 
 
     def readTemperature(self):
-        self.currentTemp=self.interface.getAIN(self.channel)
+        self.currentTemp=self.interface.getAIN(self.channel)*self.interface_scalefactor
         self.currentTemp=self._voltage_to_resistance(self.currentTemp)
         self.currentTemp=self._resistance_to_temperature(self.currentTemp)
 

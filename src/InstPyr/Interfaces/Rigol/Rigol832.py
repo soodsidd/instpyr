@@ -105,6 +105,11 @@ class Rigol832(interface):
         self.device.write(command)
         time.sleep(_delay)
 
+    def setCurrentandVoltage(self,channel,current,voltage):
+        command=':APPL Ch%s,%s,%s'%(channel,voltage,current)
+        self.device.write(command)
+        time.sleep(_delay)
+
     def setCurrentLim(self,currentlim,channel=0):
         if channel==0:
             for i in range(3):
