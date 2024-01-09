@@ -29,6 +29,7 @@ class MainWindow(QMainWindow,Template_Backend):
 
         #Setup variables
         self.variable=0
+        self.time=0
 
 
 
@@ -37,7 +38,9 @@ class MainWindow(QMainWindow,Template_Backend):
 
 
         #setup a 'watch' for every variable that you want to plot and append that to 'watchlist'
-        self.watchlist.append(watch('A single variable', nameof(self.variable),self.variableProbe))
+        watch(self,'A single variable', nameof(self.variable))
+        watch(self,'Time (s)',nameof(self.time))
+
 
 
 
@@ -48,6 +51,7 @@ class MainWindow(QMainWindow,Template_Backend):
     def mainloop(self):
         #Read sensors and update variables
         self.variable=self.inst.readTemperature(1)
+        self.time+=self.elapsedtime
 
         #PID assignments- Assign variable to control to self.PV, input self.controlsig to actuator
 

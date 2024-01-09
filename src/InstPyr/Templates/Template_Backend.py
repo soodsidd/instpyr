@@ -77,6 +77,7 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
         self.logenable = False
         self.currentTime = time.perf_counter()
         self.datapointcount=0
+        self.elapsedtime=0
         if not DUALPLOT:
             self.Mainplot_2.setVisible(False)
 
@@ -240,8 +241,8 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
     def _postInit(self):
         # ************STATIC CODE************
         # setup widgets
-        self.plot_top = Plotter(self.Mainplot,datetimeaxis=False, variables=[x for x in self.watchlist if x.plot==0])
-        self.plot_bottom = Plotter(self.Mainplot_2,datetimeaxis=False, variables=[x for x in self.watchlist if x.plot==1])
+        self.plot_top = Plotter(self.Mainplot,datetimeaxis=False, variables=[x for x in watch.get_all_instances() if x.plot==0])
+        self.plot_bottom = Plotter(self.Mainplot_2,datetimeaxis=False, variables=[x for x in watch.get_all_instances() if x.plot==1])
 
         # setup threads
         self.lock=threading.Lock
@@ -276,8 +277,9 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
         self.watchlist = temp
     def loadqueues(self,displayinterval,loginterval):
         vardata = {}
-        for watch in self.watchlist.values():
-            vardata[watch.name] = watch.read()
+        watchlist=watch.get_all_instances()
+        for wtch in watchlist:
+            vardata[wtch.name] = wtch.read()
         data = [datetime.now(), vardata]
         if self.datapointcount%displayinterval==0:
             self.dispQueue.put(data)
@@ -368,8 +370,6 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
                 #construct blank data:
                 self.eventQueue.put(self.annotatemsg.toPlainText())
             self.annotatemsg.setText('')
-    def variableProbe(self,name):
-        return eval('self.'+name)
     def addButton(self,name,latching=False,default=False,parent=None,callback=None):
         btn=QtWidgets.QPushButton(name)
         font = QtGui.QFont()

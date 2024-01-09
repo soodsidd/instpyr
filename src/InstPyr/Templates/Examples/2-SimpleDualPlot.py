@@ -30,6 +30,7 @@ class MainWindow(QMainWindow,Template_Backend):
         #Setup variables
         self.variable=0
         self.variable2=0
+        self.time=0
 
 
 
@@ -37,9 +38,11 @@ class MainWindow(QMainWindow,Template_Backend):
 
 
 
-        #setup a 'watch' for every variable that you want to plot and append that to 'watchlist'
-        self.watchlist.append(watch('A single variable', nameof(self.variable),self.variableProbe,plot=0))
-        self.watchlist.append(watch('A second variable', nameof(self.variable2),self.variableProbe,plot=1))
+        #setup a 'watch' for every variable that you want to plot
+        watch(self,'A single variable', nameof(self.variable),plot=0)
+        watch(self,'A second variable', nameof(self.variable2),plot=1)
+        watch(self,'Time (s)',nameof(self.time),plot=0)
+
 
 
 
@@ -52,6 +55,7 @@ class MainWindow(QMainWindow,Template_Backend):
         #Read sensors and update variables
         self.variable=self.inst.readTemperature(1)
         self.variable2=self.variable/10
+        self.time+=1/self.samplingrate
 
         #PID assignments- Assign variable to control to self.PV, input self.controlsig to actuator
 

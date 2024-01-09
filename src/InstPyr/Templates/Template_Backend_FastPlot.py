@@ -243,9 +243,9 @@ class Template_Backend(DualPlotUI_FAST.Ui_MainWindow):
     def _postInit(self):
         # ************STATIC CODE************
         # setup widgets
-        self.plot_top = Plotter(self.Mainplot, variables=[x for x in self.watchlist if x.plot==0])
-        self.plot_bottom = Plotter(self.Mainplot_2, variables=[x for x in self.watchlist if x.plot==1])
-
+        self.plot_top = Plotter(self.Mainplot, variables=[x for x in watch.get_all_instances() if x.plot==0])
+        self.plot_bottom = Plotter(self.Mainplot_2, variables=[x for x in watch.get_all_instances() if x.plot==1])
+        watchlist=watch.get_all_instances()
         # setup threads
         self.lock=threading.Lock
         self.threadpool = QThreadPool()
@@ -271,16 +271,17 @@ class Template_Backend(DualPlotUI_FAST.Ui_MainWindow):
 
         # Reformat watchlist:
         temp = {}
-        for item in self.watchlist:
+        for item in watchlist:
             name = item.variableName
             temp[name] = item
-        self.watchlist = temp
+        watchlist = temp
         self.mainloop()
 
     def loadqueues(self,displayinterval,loginterval):
         vardata = {}
-        for watch in self.watchlist.values():
-            vardata[watch.name] = watch.read()
+        watchlist=watch.get_all_instances()
+        for wtch in watchlist:
+            vardata[wtch.name] = wtch.read()
         data = [self.currentTime, vardata]
         if self.datapointcount%displayinterval==0:
             self.dispQueue.put(data)
