@@ -14,34 +14,21 @@ from PyQt5.QtCore import QMutex
 import numpy as np
 path=os.getcwd()
 curr=os.path.basename(path)
-if curr=='Templates' or 'Examples':
-    from src.InstPyr.UI import DualPlotUI
-    from src.InstPyr.UI.CustomWidgets.LedIndicatorWidget import LedIndicator
-    import src.InstPyr.Interfaces.simulator as simulator
-    from src.InstPyr.Plotting.PlotterWatch import MyPlotterWatch as Plotter
-    from src.InstPyr.Logging import Logger
-    from src.InstPyr.Utilities.watch import watch
-    from src.InstPyr.Control.Plant import Plant
-    from src.InstPyr.Control.Filter import MyFilter,RateLimiter
-    from src.InstPyr.Control.Waveform import *
-    from src.InstPyr.Utilities.shiftregister import shiftregister
-    from src.InstPyr.Control.PID import PID,PIDAutotuneRT, TuningStatus
-    from src.InstPyr.Utilities.watch import watch
-else:
-    from InstPyr.UI import DualPlotUI
-    from InstPyr.UI.CustomWidgets.LedIndicatorWidget import LedIndicator
 
-    import InstPyr.Interfaces.simulator as simulator
-    from InstPyr.Plotting.PlotterWatch import MyPlotterWatch as Plotter
-    from InstPyr.Logging import Logger
-    from InstPyr.Control.Plant import Plant
-    from InstPyr.Utilities.watch import watch
-    from InstPyr.Utilities.shiftregister import shiftregister
-    from InstPyr.Control.Filter import MyFilter,RateLimiter
-    from InstPyr.Control.Waveform import *
-    from InstPyr.Control.PID import PID,PIDAutotuneRT, TuningStatus
-    from InstPyr.Control.Filter import RateLimiter
-    from InstPyr.Utilities.watch import watch
+from InstPyr.UI import DualPlotUI
+from InstPyr.UI.CustomWidgets.LedIndicatorWidget import LedIndicator
+
+import InstPyr.Interfaces.simulator as simulator
+from InstPyr.Plotting.PlotterWatch import MyPlotterWatch as Plotter
+from InstPyr.Logging import Logger
+from InstPyr.Control.Plant import Plant
+from InstPyr.Utilities.watch import watch
+from InstPyr.Utilities.shiftregister import shiftregister
+from InstPyr.Control.Filter import MyFilter,RateLimiter
+from InstPyr.Control.Waveform import *
+from InstPyr.Control.PID import PID,PIDAutotuneRT, TuningStatus
+from InstPyr.Control.Filter import RateLimiter
+from InstPyr.Utilities.watch import watch
 
 
 stop_threads=False
@@ -319,6 +306,7 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
         name=self.sender().objectName()
         print(name)
         if name=="LogEnable":
+            watchlist = watch.get_all_instances()
             self.logenable=self.LogEnable.isChecked()
             if self.logenable is True and self.filename.toPlainText() != '':
                 if self.logger is not None:
@@ -327,7 +315,7 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
                         #close previous file
                         self.logger.close()
                         try:
-                            self.logger=Logger.Logger(self.filename.toPlainText(),[x.name for x in self.watchlist.values()],'w+')
+                            self.logger=Logger.Logger(self.filename.toPlainText(),[x.name for x in watchlist],'w+')
                         except Exception as e:
                             print(e)
                             self.logger=None
@@ -342,10 +330,10 @@ class Template_Backend(DualPlotUI.Ui_MainWindow):
                                 continue
                             self.logQueue.task_done()
                         self.logger = Logger.Logger(self.filename.toPlainText(),
-                                                    [x.name for x in self.watchlist.values()], 'a')
+                                                    [x.name for x in self.watchlist], 'a')
                 else:
                     try:
-                        self.logger = Logger.Logger(self.filename.toPlainText(), [x.name for x in self.watchlist.values()],'w+')
+                        self.logger = Logger.Logger(self.filename.toPlainText(), [x.name for x in watchlist],'w+')
                     except Exception as e:
                         print(e)
                         self.logger=None
